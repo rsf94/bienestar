@@ -94,7 +94,9 @@ gen inas_esc=.;
 replace inas_esc=0 if asis_esc=="1";
 replace inas_esc=1 if asis_esc=="2";
 label var inas_esc "Inasistencia a la escuela";
-33
+label define inas_esc  0 "Sí asiste" 
+                       1 "No asiste";
+label value inas_esc inas_esc;
 
 *Nivel educativo;
 destring nivelaprob gradoaprob antec_esc, replace;
