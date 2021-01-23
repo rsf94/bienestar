@@ -1,6 +1,6 @@
 *Cálculo de la riqueza de los hogares 2010
 
-*Vivienda 2010
+*Vivienda 2010a
 use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Vivienda 2010.dta" 
 keep folioviv foliohog tenen renta estim factor
 rename estim estim_pago

@@ -94,9 +94,7 @@ gen inas_esc=.;
 replace inas_esc=0 if asis_esc=="1";
 replace inas_esc=1 if asis_esc=="2";
 label var inas_esc "Inasistencia a la escuela";
-label define inas_esc  0 "Sí asiste" 
-                       1 "No asiste";
-label value inas_esc inas_esc;
+33
 
 *Nivel educativo;
 destring nivelaprob gradoaprob antec_esc, replace;
@@ -2162,18 +2160,13 @@ save "$bases/pobreza_18.dta", replace;
 
 
 
-*/
 
 #delimit cr
 
 
-
-
-
-
-
-
+***************************************************************************************
 ******************Cálculo de la riqueza de los hogares 2018****************************
+***************************************************************************************
 
 
 ********************************Vivienda: el valor de la riqueza física como el valor de la vivienda, usando lo que paga o pagaría de renta por la vivienda
@@ -2474,3 +2467,14 @@ save "$bases/Riqueza de los hogares 2018.dta", replace
 merge 1:m folioviv foliohog using "$bases/pobreza_18.dta", nogen
 gen riq_persona=riq_tot/tamhogesc
 
+
+gen grupo_edad=.
+
+replace grupo_edad = 1 if edad<=20
+replace grupo_edad = 2 if edad>20 &edad<=40
+replace grupo_edad = 3 if edad>40 &edad<=60
+replace grupo_edad = 4 if edad>60 &edad<=80
+replace grupo_edad = 5 if edad>80
+
+label define g_edad  1 "menor a 20" 2 "20-40" 3 "40-60" 4 "60-80" 5 "mayor a 80"
+label value grupo_edad g_edad
