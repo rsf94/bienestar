@@ -21,16 +21,26 @@ para evitar problemas con computadoras con encodings distintos a UTF8 */
 * Status:         in use                                                       *
 ********************************************************************************
 
+*NOTAS
+*Hace falta bajar la base de erogaciones de  https://www.inegi.org.mx/programas/enigh/nc/2018/#Microdatos
+*Hay que crear las carpetas Bases y logs antes de correr el do file
+
+
+
+#delimit ;
 
 gl data="C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\Tareas\t2\coneval_pobreza\STATA_2018\Base de datos";
 gl bases="C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\Tareas\t2\coneval_pobreza\STATA_2018\Bases";
 gl log="C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\Tareas\t2\coneval_pobreza\STATA_2018\logs";
 
-log using "$log\Riqueza.smcl", replace;
+log using "$log/Riqueza", smcl replace;
+
+
+
 
 ************************ POBREZA Y CARENCIAS DE CONEVAL *************************
 
-#delimit;
+
 
 /*Este programa debe ser utilizado con el Software Stata 
 versión 10 o superior. 
@@ -67,7 +77,7 @@ globals (gl);
 *INDICADOR DE CARENCIA POR REZAGO EDUCATIVO
 *********************************************************;
 
-use "$data\poblacion.dta", clear;
+use "$data/poblacion.dta", clear;
 
 *Población objeto: no se incluye a huéspedes ni trabajadores domésticos;
 drop if parentesco>="400" & parentesco <"500";
@@ -148,7 +158,7 @@ label value hli hli;
 
 keep  folioviv foliohog numren edad anac_e inas_esc niv_ed ic_rezedu hli parentesco;
 sort  folioviv foliohog numren;
-save "$bases\ic_rezedu18.dta", replace;
+save "$bases/ic_rezedu18.dta", replace;
 
 
 ************************************************************************
@@ -157,7 +167,7 @@ save "$bases\ic_rezedu18.dta", replace;
 ***********************************************************************;
 
 *Acceso a Servicios de salud por prestaciones laborales;
-use "$data\trabajos.dta", clear;
+use "$data/trabajos.dta", clear;
 
 *Tipo de trabajador: identifica la población subordinada e independiente;
 
@@ -195,9 +205,9 @@ label var trab "Población con al menos un empleo";
 
 keep  folioviv foliohog numren trab tipo_trab* ocupa*;
 sort  folioviv foliohog numren;
-save "$bases\ocupados18.dta", replace;
+save "$bases/ocupados18.dta", replace;
 
-use "$data\poblacion.dta", clear;
+use "$data/poblacion.dta", clear;
 
 *Población objeto: no se incluye a huéspedes ni trabajadores domésticos;
 drop if parentesco>="400" & parentesco <"500";
@@ -205,7 +215,7 @@ drop if parentesco>="700" & parentesco <"800";
 
 sort  folioviv foliohog numren;
  
-merge  folioviv foliohog numren using "$bases\ocupados18.dta";
+merge  folioviv foliohog numren using "$bases/ocupados18.dta";
 tab _merge;
 drop _merge;
 
@@ -414,7 +424,7 @@ label value ic_asalud caren;
 
 keep  folioviv foliohog numren sexo ic_asalud sa_* *_sa segpop atemed inst_* inscr_* segvol_* discap;
 sort  folioviv foliohog numren;
-save "$bases\ic_asalud18.dta", replace;
+save "$bases/ic_asalud18.dta", replace;
 
 
 *********************************************************
@@ -423,7 +433,7 @@ save "$bases\ic_asalud18.dta", replace;
 *********************************************************;
 
 *Prestaciones laborales;
-use "$data\trabajos.dta", clear;
+use "$data/trabajos.dta", clear;
 
 *Tipo de trabajador: identifica la población subordinada e independiente;
 
@@ -481,10 +491,10 @@ label var trab "Población con al menos un empleo";
 
 keep  folioviv foliohog numren trab tipo_trab* inclab* aforlab* ocupa*;
 sort  folioviv foliohog numren;
-save "$bases\prestaciones18.dta", replace;
+save "$bases/prestaciones18.dta", replace;
 
 *Ingresos por jubilaciones o pensiones;
-use "$data\ingresos.dta", clear;
+use "$data/ingresos.dta", clear;
 
 keep if clave=="P032" | clave=="P033" | clave=="P044" | clave=="P045" ;
 egen ing_pens=rmean(ing_1 ing_2 ing_3 ing_4 ing_5 ing_6) 
@@ -497,10 +507,10 @@ label var ing_pens "Ingreso promedio mensual por jubilaciones y pensiones";
 label var ing_pam "Ingreso promedio mensual por programas de adultos mayores";
 
 sort  folioviv foliohog numren;
-save "$bases\pensiones18.dta", replace;
+save "$bases/pensiones18.dta", replace;
 
 *Construcción del indicador;
-use "$data\poblacion.dta", clear;
+use "$data/poblacion.dta", clear;
 
 *Población objeto: no se incluye a huéspedes ni trabajadores domésticos;
 drop if parentesco>="400" & parentesco <"500";
@@ -508,12 +518,12 @@ drop if parentesco>="700" & parentesco <"800";
 
 *Integración de bases;
 sort  folioviv foliohog numren;
-merge  folioviv foliohog numren using "$bases\prestaciones18.dta";
+merge  folioviv foliohog numren using "$bases/prestaciones18.dta";
 tab _merge;
 drop _merge;
 
 sort  folioviv foliohog numren;
-merge  folioviv foliohog numren using "$bases\pensiones18.dta";
+merge  folioviv foliohog numren using "$bases/pensiones18.dta";
 tab _merge;
 drop _merge;
 
@@ -742,7 +752,7 @@ aforecv pea jub ss_dir par jef_ss cony_ss hijo_ss s_salud pam ic_segsoc hablaind
 
 sort  folioviv foliohog numren;
 
-save "$bases\ic_segsoc18.dta", replace;
+save "$bases/ic_segsoc18.dta", replace;
 
 
 ***********************************************************
@@ -752,12 +762,12 @@ save "$bases\ic_segsoc18.dta", replace;
 
 *Material de construcción de la vivienda;
 
-use "$data\viviendas.dta", clear;
+use "$data/viviendas.dta", clear;
 sort  folioviv;
-save "$bases\viviendas.dta", replace;
-use "$data\concentradohogar.dta", clear;
+save "$bases/viviendas.dta", replace;
+use "$data/concentradohogar.dta", clear;
 sort  folioviv;
-merge  folioviv using "$bases\viviendas.dta";
+merge  folioviv using "$bases/viviendas.dta";
 tab _merge;
 drop _merge;
 
@@ -832,17 +842,17 @@ label var ic_cv "Indicador de carencia por calidad y espacios de la vivienda";
 label value ic_cv caren;
 sort  folioviv foliohog;
 keep  folioviv foliohog icv_pisos icv_techos icv_muros icv_hac ic_cv;
-save "$bases\ic_cev18.dta", replace;
+save "$bases/ic_cev18.dta", replace;
  
 ************************************************************************
 *Parte V Indicadores de Privación Social:
 *Indicador de carencia por acceso a los servicios básicos en la vivienda
 *************************************************************************;
 
-use "$data\concentradohogar.dta", clear;
+use "$data/concentradohogar.dta", clear;
 keep  folioviv foliohog;
 sort  folioviv ;
-merge  folioviv using "$bases\viviendas.dta";
+merge  folioviv using "$bases/viviendas.dta";
 tab _merge;
 drop _merge;
 
@@ -906,7 +916,7 @@ label value ic_sbv caren;
 
 sort  folioviv foliohog;
 keep  folioviv foliohog isb_agua isb_dren isb_luz isb_combus ic_sbv;
-save "$bases\ic_sbv18.dta", replace;
+save "$bases/ic_sbv18.dta", replace;
 
 
 **********************************************************************
@@ -914,7 +924,7 @@ save "$bases\ic_sbv18.dta", replace;
 *Indicador de carencia por acceso a la alimentación
 **********************************************************************;
 
-use "$data\poblacion.dta", clear;
+use "$data/poblacion.dta", clear;
  
 *Población objeto: no se incluye a huéspedes ni trabajadores domésticos;
 drop if parentesco>="400" & parentesco <"500";
@@ -934,9 +944,9 @@ label value id_men id_men;
 
 sort  folioviv foliohog;
 keep  folioviv foliohog id_men;
-save "$bases\menores18.dta", replace;
+save "$bases/menores18.dta", replace;
 
-use "$data\hogares.dta", clear;
+use "$data/hogares.dta", clear;
 destring acc_alim*, replace;
 
 * SEIS PREGUNTAS PARA HOGARES SIN POBLACIÓN MENOR A 18 AÑOS;
@@ -982,7 +992,7 @@ label value ia_`i'men si_no;
 
 *Construcción de la Escala de inseguridad alimentaria;
 sort  folioviv foliohog;
-merge  folioviv foliohog using "$bases\menores18.dta";
+merge  folioviv foliohog using "$bases/menores18.dta";
 tab _merge;
 drop _merge;
 
@@ -1034,7 +1044,7 @@ label value ic_ali caren;
 
 sort  folioviv foliohog;
 keep  folioviv foliohog id_men ia_* tot_iaad tot_iamen ins_ali ic_ali;
-save "$bases\ic_ali18.dta", replace;
+save "$bases/ic_ali18.dta", replace;
 
 
 *********************************************************
@@ -1044,7 +1054,7 @@ save "$bases\ic_ali18.dta", replace;
 
 *Para la construcción del ingreso corriente del hogar es necesario utilizar
 información sobre la condición de ocupación y los ingresos de los individuos.
-Se utiliza la información contenida en la base "$bases\trabajo.dta" para 
+Se utiliza la información contenida en la base "$bases/trabajo.dta" para 
 identificar a la población ocupada que declara tener como prestación laboral aguinaldo, 
 ya sea por su trabajo principal o secundario, a fin de incorporar los ingresos por este 
 concepto en la medición;
@@ -1053,7 +1063,7 @@ concepto en la medición;
 
 *Ingresos;
 
-use "$data\trabajos.dta", clear;
+use "$data/trabajos.dta", clear;
 
 keep  folioviv foliohog numren id_trabajo pres_2;
 destring pres_2 id_trabajo, replace;
@@ -1082,15 +1092,15 @@ keep  folioviv foliohog numren aguinaldo1 aguinaldo2 trab;
 
 sort  folioviv foliohog numren;
 
-save "$bases\aguinaldo.dta", replace;
+save "$bases/aguinaldo.dta", replace;
 
 *Ahora se incorpora a la base de ingresos;
 
-use "$data\ingresos.dta", clear;
+use "$data/ingresos.dta", clear;
 
 sort  folioviv foliohog numren;
 
-merge  folioviv foliohog numren using "$bases\aguinaldo.dta";
+merge  folioviv foliohog numren using "$bases/aguinaldo.dta";
 
 tab _merge;
 drop _merge;
@@ -1205,7 +1215,7 @@ label var ing_tra "Ingreso corriente monetario por transferencias";
 							 
 sort  folioviv foliohog;
 
-save "$bases\ingreso_deflactado18.dta", replace;
+save "$bases/ingreso_deflactado18.dta", replace;
 
 *********************************************************
 
@@ -1216,9 +1226,9 @@ agosto del 2018.
 
 *No Monetario;
 
-use "$data\gastoshogar.dta", clear;
+use "$data/gastoshogar.dta", clear;
 gen base=1;
-append using "$data\gastospersona.dta";
+append using "$data/gastospersona.dta";
 recode base (.=2);
 
 compress;
@@ -1630,10 +1640,10 @@ replace reda_nm=reda_nm/dINPCs04 if decena==8;
 replace reda_nm=reda_nm/dINPCs05 if decena==9;
 replace reda_nm=reda_nm/dINPCs05 if decena==0;
 
-save "$bases\ingresonomonetario_def18.dta", replace;
+save "$bases/ingresonomonetario_def18.dta", replace;
 
 
-use "$bases\ingresonomonetario_def18.dta", clear;
+use "$bases/ingresonomonetario_def18.dta", clear;
 
 *Construcción de la base de pagos en especie a partir de la base 
 de gasto no monetario;
@@ -1662,9 +1672,9 @@ rename  reda_nm reda_nme;
 
 sort  folioviv foliohog;
 
-save "$bases\esp_def18.dta", replace;
+save "$bases/esp_def18.dta", replace;
 
-use "$bases\ingresonomonetario_def18.dta", clear;
+use "$bases/ingresonomonetario_def18.dta", clear;
 
 *Construcción de base de regalos a partir de la base no monetaria ;
 
@@ -1692,7 +1702,7 @@ rename  reda_nm reda_nmr;
 
 sort  folioviv foliohog;
 
-save "$bases\reg_def18.dta", replace;
+save "$bases/reg_def18.dta", replace;
 
 *********************************************************
 
@@ -1700,7 +1710,7 @@ Construcción del ingreso corriente total
 
 *********************************************************;
 
-use "$data\concentradohogar.dta", clear;
+use "$data/concentradohogar.dta", clear;
 
 keep  folioviv foliohog tam_loc factor tot_integ est_dis upm ubica_geo;
 
@@ -1708,7 +1718,7 @@ keep  folioviv foliohog tam_loc factor tot_integ est_dis upm ubica_geo;
 
 sort  folioviv foliohog;
 
-merge  folioviv foliohog using "$bases\ingreso_deflactado18.dta";
+merge  folioviv foliohog using "$bases/ingreso_deflactado18.dta";
 tab _merge;
 drop _merge;
 
@@ -1716,7 +1726,7 @@ drop _merge;
 
 sort  folioviv foliohog;
 
-merge  folioviv foliohog using "$bases\esp_def18.dta";
+merge  folioviv foliohog using "$bases/esp_def18.dta";
 tab _merge;
 drop _merge;
 
@@ -1724,7 +1734,7 @@ drop _merge;
 
 sort  folioviv foliohog;
 
-merge  folioviv foliohog using "$bases\reg_def18.dta";
+merge  folioviv foliohog using "$bases/reg_def18.dta";
 tab _merge;
 drop _merge;
 
@@ -1755,7 +1765,7 @@ label var reg_esp "Ingreso corriente no monetario regalos especie";
 
 sort  folioviv foliohog;
 
-save "$bases\ingresotot18.dta", replace;
+save "$bases/ingresotot18.dta", replace;
 
 ***********************************************************
 
@@ -1764,7 +1774,7 @@ y escalas de equivalencia
 
 ***********************************************************;
 
-use "$data\poblacion.dta", clear;
+use "$data/poblacion.dta", clear;
 
 *Población objeto: no se incluye a huéspedes ni trabajadores domésticos;
 drop if parentesco>="400" & parentesco <"500";
@@ -1804,7 +1814,7 @@ collapse (sum) tamhogesc, by(folioviv foliohog);
 
 sort  folioviv foliohog;
 
-save "$bases\tamhogesc18.dta", replace;
+save "$bases/tamhogesc18.dta", replace;
 
 
 *************************************************************************
@@ -1813,11 +1823,11 @@ save "$bases\tamhogesc18.dta", replace;
 
 *************************************************************************;
 
-use "$bases\ingresotot18.dta", clear;
+use "$bases/ingresotot18.dta", clear;
 
 *Incorporación de la información sobre el tamaño del hogar ajustado;
 
-merge  folioviv foliohog using "$bases\tamhogesc18.dta";
+merge  folioviv foliohog using "$bases/tamhogesc18.dta";
 tab _merge;
 drop _merge;
 
@@ -1885,7 +1895,7 @@ ing_mon ing_lab ing_ren ing_tra nomon pago_esp reg_esp;
 
 sort  folioviv foliohog;
 
-save "$bases\p_ingresos18.dta", replace;
+save "$bases/p_ingresos18.dta", replace;
 
 
 ************************************************************************
@@ -1898,34 +1908,34 @@ save "$bases\p_ingresos18.dta", replace;
 *Integración de las bases
 *************************;
 
-use "$bases\ic_rezedu18.dta", clear;
+use "$bases/ic_rezedu18.dta", clear;
 
-merge  folioviv foliohog numren using "$bases\ic_asalud18.dta";
+merge  folioviv foliohog numren using "$bases/ic_asalud18.dta";
 tab _merge;
 drop _merge;
 sort  folioviv foliohog numren;
 
-merge  folioviv foliohog numren using "$bases\ic_segsoc18.dta";
+merge  folioviv foliohog numren using "$bases/ic_segsoc18.dta";
 tab _merge;
 drop _merge;
 sort  folioviv foliohog;
 
-merge  folioviv foliohog using "$bases\ic_cev18.dta";
+merge  folioviv foliohog using "$bases/ic_cev18.dta";
 tab _merge;
 drop _merge;
 sort  folioviv foliohog;
 
-merge  folioviv foliohog using "$bases\ic_sbv18.dta";
+merge  folioviv foliohog using "$bases/ic_sbv18.dta";
 tab _merge;
 drop _merge;
 sort  folioviv foliohog;
 
-merge  folioviv foliohog using "$bases\ic_ali18.dta";
+merge  folioviv foliohog using "$bases/ic_ali18.dta";
 tab _merge;
 drop _merge;
 sort  folioviv foliohog;
 
-merge  folioviv foliohog using "$bases\p_ingresos18.dta";
+merge  folioviv foliohog using "$bases/p_ingresos18.dta";
 tab _merge;
 drop _merge;
 
@@ -2148,7 +2158,11 @@ label var ubica_geo "Ubicación geográfica";
 
 sort  folioviv foliohog numren;
 
-save "$bases\pobreza_18.dta", replace;
+save "$bases/pobreza_18.dta", replace;
+
+
+
+*/
 
 #delimit cr
 
@@ -2157,212 +2171,306 @@ save "$bases\pobreza_18.dta", replace;
 
 
 
+
+
 ******************Cálculo de la riqueza de los hogares 2018****************************
 
-*Estimación del valor de la vivienda propia
 
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Vivienda 2010.dta" 
-keep folioviv foliohog tenen renta estim factor
-rename estim estim_pago
-gen renta_roe= estim_pago
-replace renta_roe=renta if renta_roe==.
-gen renta_anual=renta_roe*12
-gen tasa_int=0.049
-gen inflacion=0.029
-gen depreciacion=0.01
-gen valor_viv=(renta_anual/(tasa_int- inflacion+depreciacion))
-destring tenen, replace
+********************************Vivienda: el valor de la riqueza física como el valor de la vivienda, usando lo que paga o pagaría de renta por la vivienda
+
+use "$data/viviendas.dta", clear 
+keep folioviv renta estim_pago hog_dueno1 tenencia factor
+gen renta_1= estim_pago
+replace renta_1=renta if renta_1==.
+gen renta_anual=renta_1*12
+destring hog_dueno1, replace
+replace hog_dueno1=1 if hog_dueno1==.
+gen foliohog= hog_dueno1
+tostring foliohog, replace
+loc tasa_int = 0.075 /*Tasa de CETES 28 dias de enero a dic 2018*/
+loc inflacion = 0.0483 /*inflación anual 2018*/
+loc depreciacion = 0.01 /* depreciación 1%*/
+gen tasa_viv=`tasa_int'- `inflacion'+`depreciacion'
+gen valor_viv=renta_anual*([1/tasa_viv]-[1/(tasa_viv*[(1+tasa_viv)^30])]) /*Valor presente, suponemos 30 años*/
+destring tenencia, replace
 gen propiedad=0
-replace propiedad=1 if tenen==3
-replace propiedad=1 if tenen==4
-order folioviv foliohog renta estim_pago renta_roe renta_anual tasa_int inflacion depreciacion tenen propiedad valor_viv factor
-label var renta_roe "Renta real o estimada"
+replace propiedad=1 if tenencia==3 | tenencia==4
+order folioviv foliohog hog_dueno1 renta estim_pago renta_1 renta_anual tenencia propiedad valor_viv
+label var renta_1 "Renta real o estimada"
 label var renta_anual "Renta real o estimada anual"
-label var tasa_int "Tasa de interÃ©s"
-label var inflacion "Tasa de inflaciÃ³n"
-label var depreciacion "Tasa de depreciaciÃ³n"
 label var propiedad "Propiedad"
 label var valor_viv "Valor de la vivienda"
-label define tenen 1 "Rentada" 2 "Prestada" 3 "Propia pero la estÃ¡ pagando" 4 "Propia" 5 "Intestada o en litigio" 6 "Otra situaciÃ³n"
-label values tenen tenen
+label var foliohog "Identificador del hogar"
+label define tenencia 1 "Rentada" 2 "Prestada" 3 "Propia pero la está pagando" 4 "Propia" 5 "Intestada o en litigio" 6 "Otra situación"
+label values tenencia tenencia
 label define propiedad 1 "Propia" 0 "No propia"
 label values propiedad propiedad
-gen val_viv_prop= valor_viv
-label var val_viv_prop "Valor de la vivienda propia"
-replace val_viv_prop=0 if propiedad==0
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Vivienda refinada (riqueza física) 2010.dta"
-
-*Ingresos
-*usamos los de coneval, las variables ict e ictpc de
+gen riq_fis= valor_viv
+label var riq_fis "Riqueza física"
+replace riq_fis=0 if propiedad==0
+tempfile valor_vivienda
+save `valor_vivienda'
 
 
 
-*Deuda vivienda
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Vivienda 2010.dta"  
-keep folioviv foliohog pagoviv
-gen pagoviv_anual=pagoviv*12
-gen deudaviv=.
-gen tasa_int=0.028
-gen n=20
-replace deudaviv= pagoviv_anu /(tasa_int+(1/n))
-drop tasa_int n pagoviv
-destring foliohog, replace
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\deuda vivienda.dta"
+********************************Ingresos: se saca el valor presente de los distintos tipos de ingresos
 
-*Erogaciones
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Erogaciones 2010.dta"
-keep folioviv foliohog clave ero_tri
-gen clave_erog=substr(clave,2,3)
-destring clave_erog, replace
-drop if clave_erog<3
-drop if clave_erog>5 & clave_erog<11
-drop if clave_erog>11
-gen ero_anual= ero_tri*4
-drop ero_tri
-gen tasa_int=.
-gen deuda=.
-order folioviv foliohog clave_erog ero_anual tasa_int deuda clave 
-destring foliohog, replace
-label var ero_anual "ErogaciÃ³n anual"
-label var tasa_int "Tasa de interÃ©s"
-label var deuda "Deuda"
-label var clave_erog "Identificador del producto"
-label define clave_erog 3 "Pagos a tarjeta de crÃ©dito bancaria o comercial (incluye intereses)" 4 "Pago de deudas a la empresa donde trabajan y/o a otras personas o instituciones (excluye crÃ©ditos hipotecarios)" 5 "Pago de intereses por prÃ©stamos recibidos" 11 "Pago de hipotecas de bienes inmuebles"
-label values clave_erog clave_erog
-gen rp=0.0735
-label var rp "Rendimiento promedio"
-replace tasa_int=rp+0.028 if clave_erog==11
-replace tasa_int=rp+0.007 if clave_erog==5
-replace tasa_int=rp+0.007 if clave_erog==4
-replace tasa_int=rp+0.0012 if clave_erog==3
-gen n=.
-label var n "NÃºmero de aÃ±os a pagar por el principal"
-replace n=2 if clave_erog==4
-replace n=7/12 if clave_erog==3
-replace deuda=ero_anual/(tasa_int+(1/n))
-order folioviv foliohog clave_erog ero_anual rp tasa_int n deuda clave
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Erogaciones refinada (deuda total) 2010.dta"
+use "$data/ingresos.dta",clear 
+merge m:1 folioviv foliohog numren using "$data/poblacion.dta", nogen keepusing(edad sexo)
+keep folioviv foliohog numren clave ing_tri edad sexo
+gen clave_ing = substr(clave,2,3)
+destring clave_ing sexo, replace
+gen ing_anual = ing_tri * 4
+drop ing_tri
+gen tasa_int = .
+gen val_acervo = 0
+order folioviv foliohog numren clave_ing ing_anual tasa_int val_acervo clave  
+label var clave_ing "Clave de ingreso"
+label var ing_anual "Ingreso anual"
+label var tasa_int "Tasa de interés"
+label var val_acervo "Valor del acervo"
+label define clave_ing 23 "Alquiler de tierras y terrenos, dentro y fuera del país" ///
+24 "Alquiler de casas, edificios, locales y otros inmuebles que están dentro del país" /// 
+25 "Alquiler de casas, edificios, locales y otros inmuebles que están fuera del país" /// 
+26 "Intereses provenientes de inversiones a largo plazo" ///
+27 "Intereses provenientes de cuentas de ahorro" ///
+28 "Intereses provenientes de préstamos a terceros" /// 
+29 "Rendimientos provenientes de bonos o cédulas" ///
+30 "Alquiler de marcas, patentes y derechos de autor" ///
+31 "Otros ingresos por renta de la propiedad" 50 "Ingresos anuales por rendimiento de acciones que posea de alguna empresa en la que no trabajó"
+label values clave_ing clave_ing
+	*Alquiler de tierras y terrenos, dentro y fuera del país
+replace tasa_int = 0.023 if clave_ing == 23
+	*Alquiler de casas, edificios, locales y otros inmuebles que están dentro del país
+replace tasa_int = 0.023 if clave_ing == 24
+	*Alquiler de casas, edificios, locales y otros inmuebles que están fuera del país
+replace tasa_int = 0.023 if clave_ing == 25
+	*Intereses provenientes de inversiones a plazo fijo
+replace tasa_int = 0.031 if clave_ing == 26
+	*Intereses provenientes de cuentas de ahorro
+replace tasa_int = 0.025 if clave_ing == 27
+	*Intereses provenientes de préstamos a terceros
+replace tasa_int = 0.033 if clave_ing == 28
+	*Rendimientos provenientes de bonos o cédulas
+replace tasa_int = 0.018 if clave_ing == 29
+	*Alquiler de marcas, patentes y derechos de autor
+replace tasa_int = 0.026 if clave_ing == 30
+	*Otros ingresos por renta de la propiedad no considerados en los anteriores
+replace tasa_int = 0.026 if clave_ing == 31
+	*Ingresos anuales por rendimientos de acciones que posea de alguna empresa en la que no trabajó
+replace tasa_int = 0.018 if clave_ing == 50
+	*Ingresos por jubilaciòn
+replace tasa_int = 0.075 if clave_ing == 32 | clave_ing == 33
+*Para la tasa de interès de las jubilaciones uso el promedio de agosto a diciembre de 2014 del IRN (Indice de Rendimiento Neto) neto de afores
+replace val_acervo = ing_anual / tasa_int
+replace val_acervo = 0 if val_acervo == .
+generate valor_acervo = val_acervo
+replace valor_acervo = ing_anual / tasa_int if clave_ing == 23 | clave_ing == 30 | clave_ing == 31 | clave_ing == 50
+gen periodos = .
+replace periodos = 30 if clave_ing == 24 | clave_ing == 25
+replace periodos = 3 if clave_ing == 26 | clave_ing == 27
+replace periodos = 2 if clave_ing == 28 | clave_ing == 29 | clave_ing == 52
+/* NECESITAMOS UN VALOR O REGLA PARA TRAER EL INGRESO A VALOR PRESENTE, una idea es esperanza de vida por edad y sexo*/
+replace periodos = 77.84-edad if sexo==2 & (clave_ing == 32 | clave_ing == 33) /*jubilaciones*/
+replace periodos = 72.12-edad if sexo==1 & (clave_ing == 32 | clave_ing == 33) /*jubilaciones*/
+replace periodos = 0 if periodos<0 & (clave_ing == 32 | clave_ing == 33)
 
-*Riqueza fÃ­sica
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Vivienda refinada (riqueza física) 2010.dta"
-keep folioviv foliohog val_viv_prop
-destring foliohog, replace
-gen riq_fis= val_viv_prop
-replace riq_fis=0 if riq_fis==.
-label var riq_fis "Riqueza fÃ­sica"
-drop val_viv_prop  
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Riqueza física 2010.dta"
+replace valor_acervo=ing_anual*([1/tasa_int]-[1/(tasa_int*[(1+tasa_int)^periodos])]) ///
+if clave_ing == 24 | clave_ing == 25 | clave_ing == 26 | clave_ing == 27 | clave_ing == 28 ///
+| clave_ing == 32 | clave_ing == 33 | clave_ing == 29 | clave_ing == 52
 
-*Riqueza financiera
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Ingresos refinada (riqueza financiera) 2010.dta"
+replace val_acervo= valor_acervo
+tempfile vp_ingresos
+save `vp_ingresos'
+
+
+
+
+
+
+
+********************************Ahora obtenemos las cantidades de riqueza fisica y financiera
+	* Riqueza Fisica
+use `vp_ingresos', clear
+gen val_acervo_fisico = valor_acervo if clave>="P023" & clave<="P025"
+collapse (sum) val_acervo_fisico, by(folioviv foliohog)
+gen hogar=folioviv + foliohog
+tostring foliohog, replace
+tempfile ingresos_fisicos
+save `ingresos_fisicos'
+use `valor_vivienda', clear
+merge 1:1 folioviv foliohog using `ingresos_fisicos'
+replace riq_fis = valor_viv + val_acervo_fisico
+keep folioviv foliohog riq_fis factor
+tempfile riqueza_fisica
+save `riqueza_fisica'
+
+	** Riqueza fisica local
+** Estimaciòn de la vivienda màs valor del acervo de terrenos e inmuebles locales
+use `vp_ingresos', clear
+gen renta_fis_loc = 0
+replace renta_fis_loc = 1 if clave == "P023" | clave == "P024"
+gen ingreso_renta_fisl = valor_acervo if renta_fis_loc == 1
+rename ingreso_renta_fisl val_acervo_fis_loc
+collapse (sum) val_acervo_fis_loc, by(folioviv foliohog)
+gen hogar = folioviv + foliohog
+tostring foliohog, replace
+tempfile ingresos_fisicos_locales
+save `ingresos_fisicos_locales'
+use `valor_vivienda', clear
+merge 1:1 folioviv foliohog using `ingresos_fisicos_locales'
+replace riq_fis = valor_viv + val_acervo_fis_loc
+gen riq_fis_loc=riq_fis
+label var riq_fis_loc "Riqueza Fisica Local"
+drop riq_fis _merge
+tempfile riqueza_fisica_local
+save `riqueza_fisica_local'
+
+	** Riqueza fisica extranjera
+use `vp_ingresos', clear
+gen renta_fis_for = 0
+replace renta_fis_for = 1 if clave == "P025"
+gen ingreso_renta_fisf = valor_acervo if renta_fis_for == 1
+rename ingreso_renta_fisf val_acervo_fis_for
+collapse (sum) val_acervo_fis_for, by(folioviv foliohog)
+gen hogar=folioviv + foliohog
+tostring foliohog, replace
+gen riq_fis_for = val_acervo_fis_for
+label var riq_fis_for "Riqueza Fisica Extranjera"
+drop val_acervo_fis_for 
+tempfile riqueza_fisica_extranjera
+save `riqueza_fisica_extranjera'
+	
+	*Riqueza Financiera
+use `vp_ingresos', clear
+drop if clave >= "P023" & clave <= "P025"
 collapse (sum) val_acervo, by (folioviv foliohog)
 rename val_acervo riq_fin
 label var riq_fin "Riqueza financiera bruta"
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Riqueza financiera bruta 2010.dta"
+tempfile riqueza_financiera_bruta
+save `riqueza_financiera_bruta'
 
-*Deuda
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Erogaciones refinada (deuda total) 2010.dta" 
+
+
+
+********************************Deuda
+use "$data/erogaciones.dta" 
+keep folioviv foliohog clave ero_tri
+gen clave_erog = substr(clave,2,3)
+destring clave_erog, replace
+drop if clave_erog < 3
+drop if clave_erog > 4 & clave_erog < 100
+gen ero_anual= ero_tri*4
+drop ero_tri
+gen tasa_int = .
+gen deuda = .
+order folioviv foliohog clave_erog ero_anual tasa_int deuda clave 
+destring foliohog, replace
+label var ero_anual "Erogación anual"
+label var tasa_int "Tasa de interes"
+label var deuda "Deuda"
+label var clave_erog "Identificador del producto"
+label define clave_erog 3 "Pagos a tarjeta de crédito bancaria o comercial (incluye intereses)" ///
+4 "Pago de deudas a la empresa donde trabajan y/o a otras personas o instituciones (excluye créditos hipotecarios)" ///
+100 "Pago de la vivienda propia y que se está pagando"
+label values clave_erog clave_erog
+gen rp = 0.0272
+label var rp "Rendimiento promedio"
+replace tasa_int = rp+0.008 if clave_erog == 100 /*No sé de donde salían estas tasas*/
+replace tasa_int = rp+0.007 if clave_erog == 4 /*No sé de donde salían estas tasas*/
+replace tasa_int = rp+0.0012 if clave_erog == 3 /*No sé de donde salían estas tasas*/
+gen n=.
+label var n "Número de años a pagar por el principal"
+replace n = 20 if clave_erog == 100 /*Hipoteca a 20 años*/
+replace n = 2 if clave_erog == 4 /*No sé de donde salían estos plazos*/
+replace n = 7/12 if clave_erog == 3 /*No sé de donde salían estos plazos*/
+replace deuda=ero_anual/(tasa_int+(1/n))
+order folioviv foliohog clave_erog ero_anual rp tasa_int n deuda clave
 collapse (sum) deuda, by (folioviv foliohog)
-merge m:m folioviv foliohog using "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\deuda vivienda.dta"
-replace deuda=0 if deuda==.
-replace deudaviv=0 if deudaviv==.
-gen deuda_tot= deuda+ deudaviv
-drop deuda deudaviv _merge pagoviv_anual
-rename deuda_tot deuda
+tostring foliohog, replace
 label var deuda "Deuda total"
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Deuda 2010.dta"
+tempfile deuda_total
+save `deuda_total'
 
-*Riqueza total neta
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Riqueza física 2010.dta"
-merge 1:1 folioviv foliohog using "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Deuda 2010.dta"
-rename _merge _merge2
-merge 1:1 folioviv foliohog using "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Riqueza financiera bruta 2010.dta"
-replace deuda=0 if deuda==.
-replace riq_fin=0 if riq_fin==.
-replace riq_fis=0 if riq_fis==.
-drop _merge _merge2
+
+
+*Tamaño de los hogares
+use "$data/poblacion.dta"
+gen hogar = folioviv + foliohog
+gen numren2 = numren
+destring numren2, replace
+by hogar, sort: egen tam_hog = max (numren2)
+drop numren2
+label var hogar "Identificador del hogar"
+label var tam_hog "Tamaño del Hogar"
+duplicates drop hogar, force
+keep folioviv foliohog numren hogar tam_hog
+tempfile tamaño
+save `tamaño'
+
+
+
+********************************Riqueza total neta
+use `riqueza_fisica'
+merge 1:1 folioviv foliohog using `deuda_total', nogen
+merge 1:1 folioviv foliohog using `riqueza_financiera_bruta',
+tostring foliohog, replace
+merge 1:1 folioviv foliohog using `riqueza_fisica_local', nogen
+merge 1:1 folioviv foliohog using `riqueza_fisica_extranjera', nogen
+replace deuda = 0 if deuda == .
+replace riq_fin = 0 if riq_fin == .
+replace riq_fis = 0 if riq_fis == .
 order folioviv foliohog riq_fin deuda riq_fis
-gen riq_fin_net= riq_fin- deuda
-gen riq_tot= riq_fin_net+ riq_fis
-gen riq_tot_bru= riq_fin+ riq_fis
+gen riq_fin_net = riq_fin - deuda
+gen riq_tot_bru = riq_fin + riq_fis
+gen riq_tot = riq_fin_net + riq_fis
 label var riq_fin_net "Riqueza financiera neta"
-label var riq_tot "Riqueza total neta"
 label var riq_tot_bru "Riqueza total bruta"
-gen estatus=.
-replace estatus=1 if riq_tot<0
-replace estatus=2 if riq_tot==0
-replace estatus=3 if riq_tot>0
-label var estatus "Estatus de la riqueza"
-label define estatus 1 "Riqueza negativa" 2 "Riqueza nula" 3 "Riqueza positiva"
-label values estatus estatus
-order folioviv foliohog riq_fis riq_fin deuda riq_fin_net riq_tot riq_tot_bru estatus
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Riqueza de los hogares 2010.dta"
+label var riq_tot "Riqueza total neta"
+merge 1:1 folioviv foliohog using `tamaño', nogen
 
-*Factor de expansiÃ³n
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Concentrado 2010.dta" 
-keep folioviv foliohog factor
-destring foliohog, replace
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Factor 2010.dta"
+/*Este es un desmadre de ajustar con cuentas nacionales
 
-*Deciles de ingreso
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Ingresos 2010.dta" 
-keep folioviv foliohog ing_tri
-collapse (sum) ing_tri, by (folioviv foliohog)
-sort ing_tri
-gen decil=.
-replace decil=1 in 1/2800
-replace decil=2 in 2801/5600
-replace decil=3 in 5601/8400
-replace decil=4 in 8401/11200
-replace decil=5 in 11201/14000
-replace decil=6 in 14001/16800
-replace decil=7 in 16801/19600
-replace decil=8 in 19601/22400
-replace decil=9 in 22401/25200
-replace decil=10 in 25201/27593
-label var decil "Decil de ingreso"
-destring foliohog, replace
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Decil 2010.dta" 
+** Para ver el total de riqueza en la base de datos
+tabstat riq_fin riq_fis [w=factor_hog], statistics (mean median sum) f(%17.4g)
 
-*Riqueza con decil y factor
-use "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Riqueza de los hogares 2010.dta" 
-merge m:m folioviv foliohog using "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Decil 2010.dta"
-drop if _merge==1
-drop _merge
-merge m:m folioviv foliohog using "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\factor 2010.dta"
-drop if _merge==2
-drop _merge
-**Riqueza en pesos de 2000
-gen rfb_p2000= riq_fin/1.55
-gen deuda_p2000= deuda/1.55
-gen rfn_p2000= rfb_p2000- deuda_p2000
-gen rfis_p2000= riq_fis/1.55
-gen rt_p2000= rfn_p2000+ rfis_p2000
-gen rtb_p2000= rfb_p2000+ rfis_p2000
-label var rfb_p2000 "Riqueza financiera bruta en pesos de 2000"
-label var deuda_p2000 "Deuda en pesos de 2000"
-label var rfn_p2000 "Riqueza financiera neta en pesos de 2000"
-label var rfis_p2000 "Riqueza fÃ­sica en precios de 2000"
-label var rt_p2000 "Riqueza total neta en precios de 2000"
-label var rtb_p2000 "Riqueza total buta en pesos de 2000"
-**Riqueza promedio de los hogares
-table decil [iw=factor], c(freq sum rfb_p2000 mean rfb_p2000)
-table decil [iw=factor], c(freq sum deuda_p2000 mean deuda_p2000)
-table decil [iw=factor], c(freq sum rfn_p2000 mean rfn_p2000)
-table decil [iw=factor], c(freq sum rfis_p2000 mean rfis_p2000)
-table decil [iw=factor], c(freq sum rt_p2000 mean rt_p2000)
+
 *Ajuste a cuentas nacionales
-gen rfn_aju= riq_fin_net*2.57
-gen rfn_p2000_aju= rfn_p2000*2.57
-gen rfis_aju=riq_fis*2.22
-gen rfis_p2000_aju=rfis_p2000*2.22
-gen rt_aju= rfn_aju+ rfis_aju
-gen rt_p2000_aju= rfn_p2000_aju+ rfis_p2000_aju
+gen rfb_ajustada = riq_fin * 5.35434221421472
+gen rfis_ajustada= riq_fis * 2.61853892941724
+
+
+*En el agregado la riqueza financiera neta es cero.
+*Creamos ajuste de deuda con base en M2 para obtener R. Fin. Neta = 0
+gen deuda_ajustada= deuda * 8.40069152768243
+gen rfn_ajustada= rfb_aju - deuda_ajustada
+gen rt_bru_ajustada=rfb_aju + rfis_aju
+gen rt_ajustada= rfn_aju + rfis_aju
+
+label var rfb_aju "Riqueza financiera bruta ajustada"
+label var deuda_ajustada "Deuda ajustada"
 label var rfn_aju "Riqueza financiera neta ajustada"
-label var rfis_aju "Riqueza fÃ­sica ajustada"
-label var rt_aju "Riqueza total neta ajustada"
-label var rfn_p2000_aju "Riqueza financiera neta ajustada en pesos de 2000"
-label var rfis_p2000_aju "Riqueza fÃ­sica ajustada en pesos de 2000"
-label var rt_p2000_aju "Riqueza total neta ajustada en pesos de 2000"
-order folioviv foliohog decil riq_fin deuda riq_fin_net riq_fis riq_tot riq_tot_bru rfb_p2000 deuda_p2000 rfn_p2000 rfis_p2000 rt_p2000 rtb_p2000 rfn_aju rfis_aju rt_aju rfn_p2000_aju rfis_p2000_aju rt_p2000_aju estatus factor
-save "C:\Users\ceey\Desktop\Luis David Jácome\Bases ENIGH 2010\Cálculo de riqueza\Riqueza de los hogares 2010.dta", replace
+label var rfis_aju "Riqueza física ajustada"
+label var rt_bru_ajust "Riqueza total bruta ajustada"
+label var rt_ajustada "Riqueza total neta ajustada"
+
+
+* Borre ing_tri de comando order
+order folioviv foliohog riq_fin deuda riq_fin_net riq_fis riq_fis_loc riq_fis_for riq_tot riq_tot_bru ///
+rfb_aju deuda_aju rfn_aju rfis_aju rt_bru_aju rt_aju ///
+ estatus decil factor_hog
+*/
+
+save "$bases/Riqueza de los hogares 2018.dta", replace
+
+
+
+
+
+
+
+*********UNIR BASES
+
+merge 1:m folioviv foliohog using "$bases/pobreza_18.dta", nogen
+gen riq_persona=riq_tot/tamhogesc
+
