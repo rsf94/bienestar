@@ -2467,7 +2467,8 @@ save "$bases/Riqueza de los hogares 2018.dta", replace
 *********UNIR BASES
 
 merge 1:m folioviv foliohog using "$bases/pobreza_18.dta", nogen
-gen riq_persona=riq_tot/tamhogesc
+gen riq_persona=riq_tot/(tamhogesc*1000)
+label var riq_persona "Riqueza de la persona, en miles de pesos de 2018"
 
 
 gen grupo_edad=.
@@ -2480,3 +2481,17 @@ replace grupo_edad = 5 if edad>80
 
 label define g_edad  1 "menor a 20" 2 "20-40" 3 "40-60" 4 "60-80" 5 "mayor a 80"
 label value grupo_edad g_edad
+
+
+histogram riq_persona [fw=factor], percent bin(600) bcolor(red%70) /// 
+xtitle("Riqueza en miles de pesos de 2018") ytitle("Porcentaje de las persona") graphregion(color(white)) 
+
+*Comparación
+
+
+tabstat riq_persona, by(grupo_edad) s( mean sd p50)
+tabstat riq_persona, by(pea) s( mean sd p50)
+tabstat riq_persona, by(niv_ed) s( mean sd p50)
+
+
+gen ic_riqueza=.  /*valor random que aún falta decidir*/
