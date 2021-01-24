@@ -2276,9 +2276,9 @@ replace tasa_int = 0.026 if clave_ing == 30
 replace tasa_int = 0.026 if clave_ing == 31
 	*Ingresos anuales por rendimientos de acciones que posea de alguna empresa en la que no trabajó
 replace tasa_int = 0.018 if clave_ing == 50
-	*Ingresos por jubilaciòn
+	*Ingresos por jubilación
 replace tasa_int = 0.075 if clave_ing == 32 | clave_ing == 33
-*Para la tasa de interès de las jubilaciones uso el promedio de agosto a diciembre de 2014 del IRN (Indice de Rendimiento Neto) neto de afores
+*Para la tasa de interés de las jubilaciones uso el promedio de agosto a diciembre de 2014 del IRN (Indice de Rendimiento Neto) neto de afores
 replace val_acervo = ing_anual / tasa_int
 replace val_acervo = 0 if val_acervo == .
 generate valor_acervo = val_acervo
@@ -2323,7 +2323,7 @@ tempfile riqueza_fisica
 save `riqueza_fisica'
 
 	** Riqueza fisica local
-** Estimaciòn de la vivienda màs valor del acervo de terrenos e inmuebles locales
+** Estimación de la vivienda más valor del acervo de terrenos e inmuebles locales
 use `vp_ingresos', clear
 gen renta_fis_loc = 0
 replace renta_fis_loc = 1 if clave == "P023" | clave == "P024"
@@ -2516,6 +2516,11 @@ tabstat riq_persona, by(pea) s( mean sd p50)
 tabstat riq_persona, by(niv_ed) s( mean sd p50)
 
 
-gen ic_riqueza=.  /*valor random que aún falta decidir*/
+loc limite_riqueza=62.99095 /*mediana de la riqueza de la población de menos de 20 años*/
+gen ic_riqueza=0 if riq_persona<`limite_riqueza'
+replace ic_riqueza=1 if riq_persona>=`limite_riqueza'  
+
+tabstat ic_riqueza ic_rezedu ic_asalud ///
+ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor], stats(mean sum) format(%15.8gc)
 
 
