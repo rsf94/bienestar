@@ -2508,13 +2508,12 @@ label value grupo_edad g_edad
 histogram riq_persona [fw=factor], percent bin(600) bcolor(red%70) /// 
 xtitle("Riqueza en miles de pesos de 2018") ytitle("Porcentaje de las persona") graphregion(color(white)) 
 
-*Comparación
 
+*Comparación
 
 tabstat riq_persona, by(grupo_edad) s( mean sd p50)
 tabstat riq_persona, by(pea) s( mean sd p50)
 tabstat riq_persona, by(niv_ed) s( mean sd p50)
-
 
 loc limite_riqueza=62.99095 /*mediana de la riqueza de la población de menos de 20 años*/
 gen ic_riqueza=0 if riq_persona<`limite_riqueza'
@@ -2524,3 +2523,6 @@ tabstat ic_riqueza ic_rezedu ic_asalud ///
 ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor], stats(mean sum) format(%15.8gc)
 
 
+* Curva de Lorenz
+lorenz riq_persona
+lorenz graph, noci graphregion(color(white)) xtitle(Porcentaje de población) ytitle(Proporción de la riqueza total) legend(off)
