@@ -2188,6 +2188,7 @@ stats(mean sum) format(%11.6gc) by(ent);
 #delimit cr
 
 
+
 ***************************************************************************************
 ******************Cálculo de la riqueza de los hogares 2018****************************
 ***************************************************************************************
@@ -2204,7 +2205,7 @@ destring hog_dueno1, replace
 replace hog_dueno1=1 if hog_dueno1==.
 gen foliohog= hog_dueno1
 tostring foliohog, replace
-loc tasa_int = 0.075 /*Tasa de CETES 28 dias de enero a dic 2018*/
+loc tasa_int = 0.098
 loc inflacion = 0.0483 /*inflación anual 2018*/
 loc depreciacion = 0.01 /* depreciación 1%*/
 gen tasa_viv=`tasa_int'- `inflacion'+`depreciacion'
@@ -2248,7 +2249,7 @@ label var tasa_int "Tasa de interés"
 label var val_acervo "Valor del acervo"
 label define clave_ing 23 "Alquiler de tierras y terrenos, dentro y fuera del país" ///
 24 "Alquiler de casas, edificios, locales y otros inmuebles que están dentro del país" /// 
-25 "Alquiler de casas, edificios, locales y otros inmuebles que están fuera del país" /// 
+25 "Alquiler de casas, edificios, locales y otros inmuebles que están fuera del país" /// 
 26 "Intereses provenientes de inversiones a largo plazo" ///
 27 "Intereses provenientes de cuentas de ahorro" ///
 28 "Intereses provenientes de préstamos a terceros" /// 
@@ -2257,27 +2258,27 @@ label define clave_ing 23 "Alquiler de tierras y terrenos, dentro y fuera del pa
 31 "Otros ingresos por renta de la propiedad" 50 "Ingresos anuales por rendimiento de acciones que posea de alguna empresa en la que no trabajó"
 label values clave_ing clave_ing
 	*Alquiler de tierras y terrenos, dentro y fuera del país
-replace tasa_int = 0.023 if clave_ing == 23
+replace tasa_int = .098-`inflacion' if clave_ing == 23
 	*Alquiler de casas, edificios, locales y otros inmuebles que están dentro del país
-replace tasa_int = 0.023 if clave_ing == 24
+replace tasa_int = .098-`inflacion' if clave_ing == 24
 	*Alquiler de casas, edificios, locales y otros inmuebles que están fuera del país
-replace tasa_int = 0.023 if clave_ing == 25
+replace tasa_int =.098-`inflacion' if clave_ing == 25
 	*Intereses provenientes de inversiones a plazo fijo
-replace tasa_int = 0.031 if clave_ing == 26
+replace tasa_int = .0817-`inflacion' if clave_ing == 26
 	*Intereses provenientes de cuentas de ahorro
-replace tasa_int = 0.025 if clave_ing == 27
+replace tasa_int = .0817-`inflacion' if clave_ing == 27
 	*Intereses provenientes de préstamos a terceros
-replace tasa_int = 0.033 if clave_ing == 28
+replace tasa_int = .22-`inflacion' if clave_ing == 28
 	*Rendimientos provenientes de bonos o cédulas
-replace tasa_int = 0.018 if clave_ing == 29
+replace tasa_int = 0.0817-`inflacion' if clave_ing == 29
 	*Alquiler de marcas, patentes y derechos de autor
-replace tasa_int = 0.026 if clave_ing == 30
+replace tasa_int = 0.0817-`inflacion' if clave_ing == 30
 	*Otros ingresos por renta de la propiedad no considerados en los anteriores
-replace tasa_int = 0.026 if clave_ing == 31
+replace tasa_int = 0.0817-`inflacion' if clave_ing == 31
 	*Ingresos anuales por rendimientos de acciones que posea de alguna empresa en la que no trabajó
-replace tasa_int = 0.018 if clave_ing == 50
+replace tasa_int = 0.0817-`inflacion' if clave_ing == 50
 	*Ingresos por jubilación
-replace tasa_int = 0.075 if clave_ing == 32 | clave_ing == 33
+replace tasa_int = 0.0817-`inflacion' if clave_ing == 32 | clave_ing == 33
 *Para la tasa de interés de las jubilaciones uso el promedio de agosto a diciembre de 2014 del IRN (Indice de Rendimiento Neto) neto de afores
 replace val_acervo = ing_anual / tasa_int
 replace val_acervo = 0 if val_acervo == .
@@ -2383,7 +2384,7 @@ gen tasa_int = .
 gen deuda = .
 order folioviv foliohog clave_erog ero_anual tasa_int deuda clave 
 destring foliohog, replace
-label var ero_anual "Erogación anual"
+label var ero_anual "Erogación anual"
 label var tasa_int "Tasa de interes"
 label var deuda "Deuda"
 label var clave_erog "Identificador del producto"
@@ -2391,18 +2392,16 @@ label define clave_erog 3 "Pagos a tarjeta de crédito bancaria o comercial (inc
 4 "Pago de deudas a la empresa donde trabajan y/o a otras personas o instituciones (excluye créditos hipotecarios)" ///
 100 "Pago de la vivienda propia y que se está pagando"
 label values clave_erog clave_erog
-gen rp = 0.0272
-label var rp "Rendimiento promedio"
-replace tasa_int = rp+0.008 if clave_erog == 100 /*No sé de donde salían estas tasas*/
-replace tasa_int = rp+0.007 if clave_erog == 4 /*No sé de donde salían estas tasas*/
-replace tasa_int = rp+0.0012 if clave_erog == 3 /*No sé de donde salían estas tasas*/
+replace tasa_int = .098-`inflacion' if clave_erog == 100 /*No sé de donde salían estas tasas*/
+replace tasa_int = .273-`inflacion' if clave_erog == 4 /*No sé de donde salían estas tasas*/
+replace tasa_int = .22-`inflacion' if clave_erog == 3 /*No sé de donde salían estas tasas*/
 gen n=.
 label var n "Número de años a pagar por el principal"
-replace n = 20 if clave_erog == 100 /*Hipoteca a 20 años*/
+replace n = 17 if clave_erog == 100 /*Hipoteca a 20 años*/
 replace n = 2 if clave_erog == 4 /*No sé de donde salían estos plazos*/
 replace n = 7/12 if clave_erog == 3 /*No sé de donde salían estos plazos*/
 replace deuda=ero_anual/(tasa_int+(1/n))
-order folioviv foliohog clave_erog ero_anual rp tasa_int n deuda clave
+order folioviv foliohog clave_erog ero_anual  tasa_int n deuda clave
 collapse (sum) deuda, by (folioviv foliohog)
 tostring foliohog, replace
 label var deuda "Deuda total"
@@ -2447,31 +2446,23 @@ label var riq_tot "Riqueza total neta"
 merge 1:1 folioviv foliohog using `tamaño', nogen
 
 /*Este es un desmadre de ajustar con cuentas nacionales
-
 ** Para ver el total de riqueza en la base de datos
 tabstat riq_fin riq_fis [w=factor_hog], statistics (mean median sum) f(%17.4g)
-
-
 *Ajuste a cuentas nacionales
 gen rfb_ajustada = riq_fin * 5.35434221421472
 gen rfis_ajustada= riq_fis * 2.61853892941724
-
-
 *En el agregado la riqueza financiera neta es cero.
 *Creamos ajuste de deuda con base en M2 para obtener R. Fin. Neta = 0
 gen deuda_ajustada= deuda * 8.40069152768243
 gen rfn_ajustada= rfb_aju - deuda_ajustada
 gen rt_bru_ajustada=rfb_aju + rfis_aju
 gen rt_ajustada= rfn_aju + rfis_aju
-
 label var rfb_aju "Riqueza financiera bruta ajustada"
 label var deuda_ajustada "Deuda ajustada"
 label var rfn_aju "Riqueza financiera neta ajustada"
 label var rfis_aju "Riqueza física ajustada"
 label var rt_bru_ajust "Riqueza total bruta ajustada"
 label var rt_ajustada "Riqueza total neta ajustada"
-
-
 * Borre ing_tri de comando order
 order folioviv foliohog riq_fin deuda riq_fin_net riq_fis riq_fis_loc riq_fis_for riq_tot riq_tot_bru ///
 rfb_aju deuda_aju rfn_aju rfis_aju rt_bru_aju rt_aju ///
@@ -2509,24 +2500,18 @@ histogram riq_persona [fw=factor], percent bin(600) bcolor(red%70) ///
 xtitle("Riqueza en miles de pesos de 2018") ytitle("Porcentaje de las persona") graphregion(color(white)) 
 
 
+
 *Comparación
+
 
 tabstat riq_persona, by(grupo_edad) s( mean sd p50)
 tabstat riq_persona, by(pea) s( mean sd p50)
 tabstat riq_persona, by(niv_ed) s( mean sd p50)
 
-loc limite_riqueza=62.99095 /*mediana de la riqueza de la población de menos de 20 años*/
+
+loc limite_riqueza=48.3076/*mediana de la riqueza de la población de menos de 20 años*/
 gen ic_riqueza=0 if riq_persona<`limite_riqueza'
 replace ic_riqueza=1 if riq_persona>=`limite_riqueza'  
 
 tabstat ic_riqueza ic_rezedu ic_asalud ///
 ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor], stats(mean sum) format(%15.8gc)
-
-
-* Curva de Lorenz
-lorenz riq_persona
-lorenz graph, noci graphregion(color(white)) xtitle(Porcentaje de población) ytitle(Proporción de la riqueza total) legend(off)
-
-
-* Para tabla de estadística descriptiva
-tabstat riq_fis_loc riq_fis_for riq_fin deuda, columns(statistics) s(mean sd p50 max min)
