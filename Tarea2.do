@@ -2536,3 +2536,6 @@ replace no_pobv=. if pobreza==.;
 tabstat pobres2 ok [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s)
 
 
+* lorenz
+lorenz riq_persona
+lorenz graph 
