@@ -2535,4 +2535,6 @@ replace no_pobv=. if pobreza==.;
 
 tabstat pobres2 ok [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s)
 
-
+*Comandos para generar tabla 4
+tab ic_riqueza plb [w=factor], nofreq r
+tab ic_riqueza plb [w=factor], nofreq col
