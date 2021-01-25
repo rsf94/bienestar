@@ -2515,3 +2515,24 @@ replace ic_riqueza=1 if riq_persona>=`limite_riqueza'
 
 tabstat ic_riqueza ic_rezedu ic_asalud ///
 ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor], stats(mean sum) format(%15.8gc)
+
+
+#delimit;
+tabstat pobreza pobreza_m pobreza_e vul_car vul_ing no_pobv carencias carencias3 ic_rezedu ic_asalud 
+ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s);
+
+
+* resultados
+gen pobres2 = 1 if ic_riqueza==0 & (i_privacion>=1 & i_privacion!=.)
+replace pobres2=0 if (ic_riqueza==1 | i_privacion==0) & (ic_riqueza!=. & i_privacion!=.)
+
+gen ok = 0
+replace ok = 1 if ic_riqueza==1 & (i_privacion==0)
+
+gen no_pobv=cond(plb==0 & i_privacion==0,1,0);
+replace no_pobv=. if pobreza==.;
+
+
+tabstat pobres2 ok [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s)
+
+
