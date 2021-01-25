@@ -2535,7 +2535,13 @@ replace no_pobv=. if pobreza==.;
 
 tabstat pobres2 ok [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s)
 
+<<<<<<< HEAD
 
 * lorenz
 lorenz riq_persona
 lorenz graph 
+=======
+*Comandos para generar tabla 4
+tab ic_riqueza plb [w=factor], nofreq r
+tab ic_riqueza plb [w=factor], nofreq col
+>>>>>>> 953188c99d67b5b587e65939edfbb940ce3a4534
