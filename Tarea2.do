@@ -2526,3 +2526,7 @@ ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor], stats(mean sum) format(%15.8
 * Curva de Lorenz
 lorenz riq_persona
 lorenz graph, noci graphregion(color(white)) xtitle(Porcentaje de población) ytitle(Proporción de la riqueza total) legend(off)
+
+
+* Para tabla de estadística descriptiva
+tabstat riq_fis_loc riq_fis_for riq_fin deuda, columns(statistics) s(mean sd p50 max min)
