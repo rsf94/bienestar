@@ -24,14 +24,14 @@ para evitar problemas con computadoras con encodings distintos a UTF8 */
 *NOTAS
 *Hace falta bajar la base de erogaciones de  https://www.inegi.org.mx/programas/enigh/nc/2018/#Microdatos
 *Hay que crear las carpetas Bases y logs antes de correr el do file
-
+*Hay que cambiar los globals de aquí abajo al directorio de la computadora donde estén las carpetas.
 
 
 #delimit ;
 
 gl data="C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\Tareas\t2\coneval_pobreza\STATA_2018\Base de datos";
 gl bases="C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\Tareas\t2\coneval_pobreza\STATA_2018\Bases";
-gl log="C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\Tareas\t2\coneval_pobreza\STATA_2018\logs";
+gl log="/C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\Tareas\t2\coneval_pobreza\STATA_2018\logs";
 
 log using "$log/Riqueza", smcl replace;
 
@@ -2190,7 +2190,7 @@ stats(mean sum) format(%11.6gc) by(ent);
 
 
 ***************************************************************************************
-******************Cálculo de la riqueza de los hogares 2018****************************
+*****************************Cálculo de la riqueza  2018*******************************
 ***************************************************************************************
 
 
@@ -2206,10 +2206,10 @@ replace hog_dueno1=1 if hog_dueno1==.
 gen foliohog= hog_dueno1
 tostring foliohog, replace
 loc tasa_int = 0.098
-loc inflacion = 0.0483 /*inflación anual 2018*/
-loc depreciacion = 0.01 /* depreciación 1%*/
+loc inflacion = 0.0483 
+loc depreciacion = 0.01 
 gen tasa_viv=`tasa_int'- `inflacion'+`depreciacion'
-gen valor_viv=renta_anual*([1/tasa_viv]-[1/(tasa_viv*[(1+tasa_viv)^30])]) /*Valor presente, suponemos 30 años*/
+gen valor_viv=renta_anual*([1/tasa_viv]-[1/(tasa_viv*[(1+tasa_viv)^30])])
 destring tenencia, replace
 gen propiedad=0
 replace propiedad=1 if tenencia==3 | tenencia==4
@@ -2279,7 +2279,6 @@ replace tasa_int = 0.0817-`inflacion' if clave_ing == 31
 replace tasa_int = 0.0817-`inflacion' if clave_ing == 50
 	*Ingresos por jubilación
 replace tasa_int = 0.0817-`inflacion' if clave_ing == 32 | clave_ing == 33
-*Para la tasa de interés de las jubilaciones uso el promedio de agosto a diciembre de 2014 del IRN (Indice de Rendimiento Neto) neto de afores
 replace val_acervo = ing_anual / tasa_int
 replace val_acervo = 0 if val_acervo == .
 generate valor_acervo = val_acervo
@@ -2289,8 +2288,8 @@ replace periodos = 30 if clave_ing == 24 | clave_ing == 25
 replace periodos = 3 if clave_ing == 26 | clave_ing == 27
 replace periodos = 2 if clave_ing == 28 | clave_ing == 29 | clave_ing == 52
 /* NECESITAMOS UN VALOR O REGLA PARA TRAER EL INGRESO A VALOR PRESENTE, una idea es esperanza de vida por edad y sexo*/
-replace periodos = 77.84-edad if sexo==2 & (clave_ing == 32 | clave_ing == 33) /*jubilaciones*/
-replace periodos = 72.12-edad if sexo==1 & (clave_ing == 32 | clave_ing == 33) /*jubilaciones*/
+replace periodos = 77.84-edad if sexo==2 & (clave_ing == 32 | clave_ing == 33) 
+replace periodos = 72.12-edad if sexo==1 & (clave_ing == 32 | clave_ing == 33)
 replace periodos = 0 if periodos<0 & (clave_ing == 32 | clave_ing == 33)
 
 replace valor_acervo=ing_anual*([1/tasa_int]-[1/(tasa_int*[(1+tasa_int)^periodos])]) ///
@@ -2308,23 +2307,8 @@ save `vp_ingresos'
 
 
 ********************************Ahora obtenemos las cantidades de riqueza fisica y financiera
-	* Riqueza Fisica
-use `vp_ingresos', clear
-gen val_acervo_fisico = valor_acervo if clave>="P023" & clave<="P025"
-collapse (sum) val_acervo_fisico, by(folioviv foliohog)
-gen hogar=folioviv + foliohog
-tostring foliohog, replace
-tempfile ingresos_fisicos
-save `ingresos_fisicos'
-use `valor_vivienda', clear
-merge 1:1 folioviv foliohog using `ingresos_fisicos'
-replace riq_fis = valor_viv + val_acervo_fisico
-keep folioviv foliohog riq_fis factor
-tempfile riqueza_fisica
-save `riqueza_fisica'
 
-	** Riqueza fisica local
-** Estimación de la vivienda más valor del acervo de terrenos e inmuebles locales
+* Riqueza fisica local
 use `vp_ingresos', clear
 gen renta_fis_loc = 0
 replace renta_fis_loc = 1 if clave == "P023" | clave == "P024"
@@ -2344,7 +2328,7 @@ drop riq_fis _merge
 tempfile riqueza_fisica_local
 save `riqueza_fisica_local'
 
-	** Riqueza fisica extranjera
+* Riqueza fisica extranjera
 use `vp_ingresos', clear
 gen renta_fis_for = 0
 replace renta_fis_for = 1 if clave == "P025"
@@ -2359,7 +2343,7 @@ drop val_acervo_fis_for
 tempfile riqueza_fisica_extranjera
 save `riqueza_fisica_extranjera'
 	
-	*Riqueza Financiera
+*Riqueza Financiera
 use `vp_ingresos', clear
 drop if clave >= "P023" & clave <= "P025"
 collapse (sum) val_acervo, by (folioviv foliohog)
@@ -2392,14 +2376,14 @@ label define clave_erog 3 "Pagos a tarjeta de crédito bancaria o comercial (inc
 4 "Pago de deudas a la empresa donde trabajan y/o a otras personas o instituciones (excluye créditos hipotecarios)" ///
 100 "Pago de la vivienda propia y que se está pagando"
 label values clave_erog clave_erog
-replace tasa_int = .098-`inflacion' if clave_erog == 100 /*No sé de donde salían estas tasas*/
-replace tasa_int = .273-`inflacion' if clave_erog == 4 /*No sé de donde salían estas tasas*/
-replace tasa_int = .22-`inflacion' if clave_erog == 3 /*No sé de donde salían estas tasas*/
+replace tasa_int = .098-`inflacion' if clave_erog == 100 
+replace tasa_int = .273-`inflacion' if clave_erog == 4 
+replace tasa_int = .22-`inflacion' if clave_erog == 3 
 gen n=.
 label var n "Número de años a pagar por el principal"
-replace n = 17 if clave_erog == 100 /*Hipoteca a 20 años*/
-replace n = 2 if clave_erog == 4 /*No sé de donde salían estos plazos*/
-replace n = 7/12 if clave_erog == 3 /*No sé de donde salían estos plazos*/
+replace n = 17 if clave_erog == 100 
+replace n = 2 if clave_erog == 4 
+replace n = 7/12 if clave_erog == 3 
 replace deuda=ero_anual/(tasa_int+(1/n))
 order folioviv foliohog clave_erog ero_anual  tasa_int n deuda clave
 collapse (sum) deuda, by (folioviv foliohog)
@@ -2409,75 +2393,30 @@ tempfile deuda_total
 save `deuda_total'
 
 
-
-*Tamaño de los hogares
-use "$data/poblacion.dta"
-gen hogar = folioviv + foliohog
-gen numren2 = numren
-destring numren2, replace
-by hogar, sort: egen tam_hog = max (numren2)
-drop numren2
-label var hogar "Identificador del hogar"
-label var tam_hog "Tamaño del Hogar"
-duplicates drop hogar, force
-keep folioviv foliohog numren hogar tam_hog
-tempfile tamaño
-save `tamaño'
-
-
-
 ********************************Riqueza total neta
-use `riqueza_fisica'
-merge 1:1 folioviv foliohog using `deuda_total', nogen
+use `deuda_total'
 merge 1:1 folioviv foliohog using `riqueza_financiera_bruta',
 tostring foliohog, replace
 merge 1:1 folioviv foliohog using `riqueza_fisica_local', nogen
 merge 1:1 folioviv foliohog using `riqueza_fisica_extranjera', nogen
 replace deuda = 0 if deuda == .
+replace riq_fis_loc = 0 if riq_fis_loc == .
+replace riq_fis_for = 0 if riq_fis_for == .
+gen riq_fis = riq_fis_loc + riq_fis_for
 replace riq_fin = 0 if riq_fin == .
 replace riq_fis = 0 if riq_fis == .
 order folioviv foliohog riq_fin deuda riq_fis
 gen riq_fin_net = riq_fin - deuda
-gen riq_tot_bru = riq_fin + riq_fis
 gen riq_tot = riq_fin_net + riq_fis
 label var riq_fin_net "Riqueza financiera neta"
-label var riq_tot_bru "Riqueza total bruta"
-label var riq_tot "Riqueza total neta"
-merge 1:1 folioviv foliohog using `tamaño', nogen
+label var riq_tot "Riqueza total"
 
-/*Este es un desmadre de ajustar con cuentas nacionales
-** Para ver el total de riqueza en la base de datos
-tabstat riq_fin riq_fis [w=factor_hog], statistics (mean median sum) f(%17.4g)
-*Ajuste a cuentas nacionales
-gen rfb_ajustada = riq_fin * 5.35434221421472
-gen rfis_ajustada= riq_fis * 2.61853892941724
-*En el agregado la riqueza financiera neta es cero.
-*Creamos ajuste de deuda con base en M2 para obtener R. Fin. Neta = 0
-gen deuda_ajustada= deuda * 8.40069152768243
-gen rfn_ajustada= rfb_aju - deuda_ajustada
-gen rt_bru_ajustada=rfb_aju + rfis_aju
-gen rt_ajustada= rfn_aju + rfis_aju
-label var rfb_aju "Riqueza financiera bruta ajustada"
-label var deuda_ajustada "Deuda ajustada"
-label var rfn_aju "Riqueza financiera neta ajustada"
-label var rfis_aju "Riqueza física ajustada"
-label var rt_bru_ajust "Riqueza total bruta ajustada"
-label var rt_ajustada "Riqueza total neta ajustada"
-* Borre ing_tri de comando order
-order folioviv foliohog riq_fin deuda riq_fin_net riq_fis riq_fis_loc riq_fis_for riq_tot riq_tot_bru ///
-rfb_aju deuda_aju rfn_aju rfis_aju rt_bru_aju rt_aju ///
- estatus decil factor_hog
-*/
 
-save "$bases/Riqueza de los hogares 2018.dta", replace
+save "$bases/Riqueza.dta", replace
 
 
 
-
-
-
-
-*********UNIR BASES
+********************************Unir bases y revisar posibles valores límite
 
 merge 1:m folioviv foliohog using "$bases/pobreza_18.dta", nogen
 gen riq_persona=riq_tot/(tamhogesc*1000)
@@ -2496,49 +2435,49 @@ label define g_edad  1 "menor a 20" 2 "20-40" 3 "40-60" 4 "60-80" 5 "mayor a 80"
 label value grupo_edad g_edad
 
 
-histogram riq_persona [fw=factor], percent bin(600) bcolor(red%70) /// 
-xtitle("Riqueza en miles de pesos de 2018") ytitle("Porcentaje de las persona") graphregion(color(white)) 
-
-
-
-*Comparación
-
-
 tabstat riq_persona, by(grupo_edad) s( mean sd p50)
 tabstat riq_persona, by(pea) s( mean sd p50)
 tabstat riq_persona, by(niv_ed) s( mean sd p50)
 
 
 loc limite_riqueza=48.3076/*mediana de la riqueza de la población de menos de 20 años*/
+
+
+
+********************************Resultados y comparación
+
+
 gen ic_riqueza=0 if riq_persona<`limite_riqueza'
 replace ic_riqueza=1 if riq_persona>=`limite_riqueza'  
 
 tabstat ic_riqueza ic_rezedu ic_asalud ///
 ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor], stats(mean sum) format(%15.8gc)
 
-
-#delimit;
-tabstat pobreza pobreza_m pobreza_e vul_car vul_ing no_pobv carencias carencias3 ic_rezedu ic_asalud 
-ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s);
+tabstat pobreza pobreza_m pobreza_e vul_car vul_ing no_pobv carencias carencias3 ic_rezedu ic_asalud ///
+ic_segsoc ic_cv ic_sbv ic_ali plb_m plb [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s)
 
 
-* resultados
 gen pobres2 = 1 if ic_riqueza==0 & (i_privacion>=1 & i_privacion!=.)
 replace pobres2=0 if (ic_riqueza==1 | i_privacion==0) & (ic_riqueza!=. & i_privacion!=.)
 
 gen ok = 0
 replace ok = 1 if ic_riqueza==1 & (i_privacion==0)
 
-gen no_pobv=cond(plb==0 & i_privacion==0,1,0);
-replace no_pobv=. if pobreza==.;
+gen no_pobv1=cond(plb==0 & i_privacion==0,1,0)
+replace no_pobv1=. if pobreza==.
 
 
 tabstat pobres2 ok [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s)
 
-* lorenz
+*Histograma y curva de Lorenz
+
+histogram riq_persona [fw=factor], percent bin(600) bcolor(red%70) /// 
+xtitle("Riqueza en miles de pesos de 2018") ytitle("Porcentaje de las persona") graphregion(color(white)) 
+
+ssc install lorenz
 lorenz riq_persona
 lorenz graph 
-=======
-*Comandos para generar tabla 4
+
+*Tabla 4
 tab ic_riqueza plb [w=factor], nofreq r
 tab ic_riqueza plb [w=factor], nofreq col
