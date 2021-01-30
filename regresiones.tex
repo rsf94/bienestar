@@ -1,0 +1,31 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{5}{c}}
+\hline\hline
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+            &\multicolumn{1}{c}{D.lnpib}&\multicolumn{1}{c}{D.lnpib}&\multicolumn{1}{c}{D.lnpib}&\multicolumn{1}{c}{D.lnpib}&\multicolumn{1}{c}{D.lnpib}\\
+\hline
+LD.lnpib    &       0.280\sym{***}&       0.292\sym{***}&       0.280\sym{***}&       0.279\sym{***}&       0.280\sym{***}\\
+            &     (14.51)         &     (12.22)         &     (14.54)         &     (14.51)         &     (14.53)         \\
+[1em]
+D.gini      &       0.188\sym{*}  &       0.285\sym{**} &                     &                     &       0.913\sym{*}  \\
+            &      (2.13)         &      (2.72)         &                     &                     &      (2.04)         \\
+[1em]
+D.kuznets1  &                     &                     &   -0.000532         &                     &                     \\
+            &                     &                     &     (-1.90)         &                     &                     \\
+[1em]
+D.top1vsbottom99&                     &                     &                     &       0.148\sym{*}  &                     \\
+            &                     &                     &                     &      (2.57)         &                     \\
+[1em]
+D.gini2     &                     &                     &                     &                     &      -0.736         \\
+            &                     &                     &                     &                     &     (-1.65)         \\
+[1em]
+\_cons      &      0.0276\sym{***}&      0.0217\sym{***}&      0.0275\sym{***}&      0.0277\sym{***}&      0.0275\sym{***}\\
+            &     (25.75)         &     (17.98)         &     (25.66)         &     (25.83)         &     (25.55)         \\
+\hline
+\(N\)       &        3017         &        1885         &        3034         &        3034         &        3017         \\
+\hline\hline
+\multicolumn{6}{l}{\footnotesize \textit{t} statistics in parentheses}\\
+\multicolumn{6}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\end{tabular}
+}

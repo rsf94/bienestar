@@ -144,4 +144,4 @@ eststo r4
 xtabond d1.lnpib d1.gini d1.gini2 if inrange(year,2000,2019)
 eststo r5
 
-esttab r1 r2 r3 r4 r5
+esttab  r1 r2 r3 r4 r5 using "$dataregresiones.tex"
