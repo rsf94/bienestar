@@ -14,10 +14,11 @@ set more off
 global data = "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\Tareas\t3\data"
 
 
+
 *++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 * PENN WORLD TABLE 
 *++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-use "$data\pwt100"
+use "$data/pwt100"
 desc
 summarize *
 
@@ -30,7 +31,7 @@ gen country2 = country
 replace country = "Bolivia" if country2 == "Bolivia (Plurinational State of)"
 replace country = "Cote d’Ivoire" if country2 == "Côte d'Ivoire"
 replace country = "Curacao" if country2 == "Curaçao"
-replace country = "Hong Kong" if country	2 == "China, Hong Kong SAR"
+replace country = "Hong Kong" if country2 == "China, Hong Kong SAR"
 replace country = "Iran" if country2 == "Iran (Islamic Republic of)"
 replace country = "Korea" if country2 == "Republic of Korea"
 replace country = "Lao PDR" if country2 == "Lao People's DR"
@@ -42,8 +43,8 @@ replace country = "Venezuela" if country2 == "Venezuela (Bolivarian Republic of)
 replace country = "Virgin Islands, British" if country2 == "British Virgin Islands"
 
 * Guardar y cargar base modificada
-save "$data\penn_wt", replace
-use "$data\penn_wt"
+save "$data/penn_wt", replace
+use "$data/penn_wt"
 
 
 *++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -56,23 +57,44 @@ use "$data\penn_wt"
 4. Merge con World Penn
 */
 
-help wid
 
-* EJEMPLO: wid, indicators(anninc) areas(ME) age(999) NOTA: hay que cambiar dependiendo de la consulta que queramos
 
-wid, indicators(mfiinc) age(999) areas(_all)
+* Consultamos la wid de las variables que queremos
+
+
+wid, indicators(gptinc) age(992) areas(_all) pop(j) clear /*gini*/
+drop variable age pop percentile
+rename value gini
+tempfile gini
+save `gini'
+
+
+wid, indicators(sptinc) age(992) areas(_all) pop(j) perc(p0p10 p10p20 p20p30 p30p40 p80p100 p90p100 p99p100 p0p50 p0p99) clear /*shares de ingreso por percentil*/
+drop variable age pop
+rename value sh_inc
+replace percentile=subinstr(percentile,".","_",.)
+reshape wide sh_inc, i(country year) j(percentile) s
+gen sh_incp0p20=sh_incp0p10+sh_incp10p20 
+gen sh_incp0p40=sh_incp0p10+sh_incp10p20+sh_incp20p30+sh_incp30p40 
+gen kuznets1=sh_incp80p100/sh_incp0p20
+gen kuznets2=sh_incp80p100/sh_incp0p40
+gen top10vsbottom50=sh_incp90p100/sh_incp0p50
+gen top1vsbottom50=sh_incp99p100/sh_incp0p50
+gen top1vsbottom99=sh_incp99p100/sh_incp0p99
+
+merge 1:1 country year using `gini', nogen
+
+
+
 
 * Mergear con nombres de países (necesario para mergear con World Penn)
-merge m:1 country using "$data\wdi_countries", keep(match)
-
-drop country _merge pop
+merge m:1 country using "$data/wdi_countries", keep(3) nogen
+drop country 
 rename name country
 
 * Ahora sí, mergear con World Penn y nos quedamos con países q sí tengan info
-drop pop
-merge m:1 year country using "$data\penn_wt"
-drop if _merge==1 | _merge==2
-drop _merge
+merge m:1 year country using "$data/penn_wt", nogen keep(3)
 
+order country year
+sort country year
 desc
-
