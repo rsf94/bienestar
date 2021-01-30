@@ -125,4 +125,23 @@ label variable lnpib "PIB real a precios constantes de 2017 (M USD)"
 * Definir datos tipo panel
 xtset country year
 
-xtabond 
+* Ia. Gini entre 2000-2019
+xtabond d1.lnpib d1.gini if inrange(year,2000,2019)
+eststo r1
+
+* Ib. Gini entre 2008-2019
+xtabond d1.lnpib d1.gini if inrange(year,2008,2019)
+eststo r2
+
+* IIa. Gini entre 2000-2019
+xtabond d1.lnpib d1.kuznets1 if inrange(year,2000,2019)
+eststo r3
+
+* IIb. 
+xtabond d1.lnpib d1.top1vsbottom99 if inrange(year,2000,2019)
+eststo r4
+
+xtabond d1.lnpib d1.gini d1.gini2 if inrange(year,2000,2019)
+eststo r5
+
+esttab r1 r2 r3 r4 r5
