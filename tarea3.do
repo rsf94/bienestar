@@ -89,12 +89,106 @@ merge 1:1 country year using `gini', nogen
 
 * Mergear con nombres de países (necesario para mergear con World Penn)
 merge m:1 country using "$data/wdi_countries", keep(3) nogen
-drop country 
+drop country
 rename name country
 
 * Ahora sí, mergear con World Penn y nos quedamos con países q sí tengan info
 merge m:1 year country using "$data/penn_wt", nogen keep(3)
+drop country2
 
 order country year
 sort country year
 desc
+
+encode country, gen(country2)
+drop country
+rename country2 country
+order country, first
+
+label variable sh_incp0p10 "income share bottom 10"
+label variable sh_incp0p50 "income share bottom 50"
+label variable sh_incp0p99 "income share pottom 99"
+label variable sh_incp0p20 "income share bottom 0"
+label variable sh_incp0p40 "income share bottom 40"
+label variable kuznets1 "20rich/20poor"
+label variable kuznets2 "20rich/40poor"
+
+
+save base_final, replace
+
+*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* REGRESIONES
+*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+gen lnpib = ln(rgdpna) 
+label variable lnpib "log PIB real a precios constantes de 2017 (M USD)"
+gen lnpib_a = ln(rgdpna/pop) 
+label variable lnpib_a "log PIBpc real a precios constantes de 2017 (M USD)"
+gen lnpib_b = ln(rgdpe) 
+label variable lnpib_b "log PIB real a precios constantes de 2017 (M USD), expenditure side"
+gen lnpib_c = ln(rgdpe/pop) 
+label variable lnpib_c "log PIBpc real a precios constantes de 2017 (M USD), expenditure side"
+gen gini_2=gini^2
+gen kuznets1_2=kuznets1^2
+gen kuznets2_2=kuznets2^2
+gen top10vsbottom50_2=top10vsbottom50^2
+gen top1vsbottom50_2=top1vsbottom50^2
+gen top1vsbottom99_2=top1vsbottom99^2
+
+
+* Definir datos tipo panel
+xtset country year
+
+
+
+***
+*Pruebas
+
+
+* Ia. Gini entre 1990-2019
+xtabond d1.lnpib d1.gini if inrange(year,1990,2019)
+eststo r1
+
+* Ia. Gini entre 2000-2019
+xtabond d1.lnpib d1.gini if inrange(year,2000,2019)
+eststo r1
+
+* Ib. Gini entre 2008-2019
+xtabond d1.lnpib d1.gini if inrange(year,2008,2019)
+eststo r2
+
+* IIa. Gini entre 2000-2019
+xtabond d1.lnpib d1.kuznets1 if inrange(year,2000,2019)
+eststo r3
+
+* IIb. 
+xtabond d1.lnpib d1.top1vsbottom99 if inrange(year,2000,2019)
+eststo r4
+
+xtabond d1.lnpib d1.gini d1.gini_2 if inrange(year,2000,2019)
+eststo r5
+
+
+loc cont=6
+foreach indvar of varlist lnpib lnpib_a lnpib_b lnpib_c  {
+foreach depvar of varlist gini kuznets1 kuznets2 top10vsbottom50 top1vsbottom50 top1vsbottom99 {
+
+di ""
+di ""
+di "**********************`indvar' `depvar' 1990"
+xtabond d1.`indvar' d1.`depvar' d1.`depvar'_2 if inrange(year,1990,2019)
+eststo r`cont'
+loc cont=`cont'+1
+
+di ""
+di ""
+di "*********************`indvar' `depvar' 2000"
+xtabond d1.`indvar' d1.`depvar' d1.`depvar'_2 if inrange(year,1990,2019)
+eststo r`cont'
+loc cont=`cont'+1
+
+}
+}
+
+
+esttab  r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15 r16 r17 r18 r19 r20 r21 r22 r23 r24 r25 r26 r27 r28 r29 r30 r31  using "$data/regresiones.tex", replace
+
