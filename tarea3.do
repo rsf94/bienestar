@@ -195,7 +195,7 @@ eststo rf2
 estat abond
 estat sargan
 
-esttab rf1 rf2 using "$data/regresiones_finales.tex"
+esttab rf1 rf2 using "$data/regresiones_finales.tex", replace se(4)
 
 
 
