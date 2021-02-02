@@ -13,7 +13,7 @@ summarize
 
 
 * Merge con base viviendas
-merge m:1 folioviv using "$directorio/viviendas"
+merge m:1 folioviv using "$directorio/viviendas", nogenerate
 
 
 *rural o urbano
@@ -28,9 +28,23 @@ gen entidad_federativa = substr(folioviv,1,2)
 *municipio
 gen municipio = substr(ubica_geo,3,3)
 
+tempfile master
+save `master'
+
 *número de integrantes del hogar
+use "$directorio/poblacion"
 gen counter2 = 1
-bysort folioviv: egen counter = count(foliohog)
+bysort folioviv foliohog: egen counter = count(foliohog)
+keep folioviv foliohog counter
+*tempfile tamaño
+*save `tamaño'
+
+merge m:m folioviv foliohog using `master'
+
+
+*número de hogares por vivienda
+destring(foliohog), replace
+bysort folioviv: egen num_hogares=max(foliohog)
 
 
 * generamos precio de los bienes
@@ -54,5 +68,5 @@ keep if inlist(clave,"A004","A008","A012","A015","A224","A233","A237")
 
 
 * Guardar base final
-save "$directorio/base_final"
+save "$directorio/base_final", replace
 
