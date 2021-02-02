@@ -28,15 +28,30 @@ gen entidad_federativa = substr(folioviv,1,2)
 *municipio
 gen municipio = substr(ubica_geo,3,3)
 
-* Variables que nos interesan
-keep folioviv foliohog clave tipo_gasto cantidad gasto
+*número de integrantes del hogar
+gen counter2 = 1
+bysort folioviv: egen counter = count(foliohog)
 
+
+* generamos precio de los bienes
+gen precio = gasto/cantidad
 
 * Nos quedamos con bienes y servicios que queremos:
-* E027 = Cines
-* E028 = Teatros y conciertos
-* E030 = Espectáculos deportivos
-keep if clave =="E027" | clave =="E028" | clave == "E030"
+* A004 = Tortilla de maíz (de todo tipo y color)
+* A008 = Tortilla de harina
+* A012 = Pan blanco
+* A015 = Pan para sándwich, hamburguesa, hotdog
+* A224 = Cerveza
+* A233 = Tequila
+* A237 = Bebida alcohólica preparada
+* 
+
+keep if inlist(clave,"A004","A008","A012","A015","A224","A233","A237")
+
+* Variables que nos interesan
+* keep folioviv foliohog clave tipo_gasto cantidad gasto
+
+
 
 * Guardar base final
 save "$directorio/base_final"
