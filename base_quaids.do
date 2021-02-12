@@ -105,10 +105,26 @@ reshape wide gastocosto cantidad precio share_gasto, i(folioviv foliohog) j(clav
 * Guardar base final
 save "$directorio/base_final", replace
 
+* renombrar variables
+
+rename share_gastoA004 share_tortillasmaiz
+rename share_gastoA008 share_tortillasharina
+rename share_gastoA012 share_panblanco
+rename share_gastoA015 share_pansandwich
+rename share_gastoA224 share_cerveza
+rename share_gastoA233 share_tequila
 
 
-/*Prueba 
-quaids share_gastoA004 share_gastoA008 share_gastoA012 share_gastoA015 share_gastoA224 share_gastoA233 share_gastoOtros, anot(10) prices(precioA004 precioA008 precioA012 precioA015 precioA224 precioA233 precioOtros) expenditure(gastototal) demographics(counter rural)
-*/
+label var share_tortillasmaiz "share tortillas maiz"
+label var share_tortillasharina "share tortillas harina"
+label var share_panblanco "share pan blanco"
+label var share_pansandwich "share pan sándwich, hamburguesa, hotdog"
+label var share_cerveza "share cerveza"
+label var share_tequila "share tequila"
+
+
+ 
+quaids share_gastoA004 share_gastoA008 share_gastoA012 share_gastoA015 share_gastoA224 share_gastoA233 share_gastoOtros, anot(10) prices(precioA004 precioA008 precioA012 precioA015 precioA224 precioA233 precioOtros) expenditure(gastototal) demographics(counter rural) nolog
+
 
 *Funciona, pero tarda muchísimo en correr
