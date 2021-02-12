@@ -122,8 +122,37 @@ label var share_pansandwich "share pan sándwich, hamburguesa, hotdog"
 label var share_cerveza "share cerveza"
 label var share_tequila "share tequila"
 
+gen ln_gastotal = ln(gastototal)
+* curvas de Engel ---------------------------------------------------------------------------------------------------------------------------
 
- 
+* relación lineal?
+loc bienes share_tortillasmaiz share_tortillasharina share_panblanco share_pansandwich share_cerveza share_tequila
+foreach var in share_tortillasmaiz share_tortillasharina share_panblanco share_pansandwich share_cerveza share_tequila share_gastoOtros {
+local lbl: variable label `var'
+twoway scatter  `var' ln_gastotal || lfitci `var' ln_gastotal  , ///
+ytitle("`lbl'") xtitle("log(gasto)") ///
+legend(off) ///
+name("graph_`var'", replace)
+}
+
+graph combine graph_share_tortillasmaiz graph_share_tortillasharina graph_share_panblanco graph_share_pansandwich graph_share_cerveza graph_share_tequila graph_share_gastoOtros
+
+* relación cuadrática?
+loc bienes share_tortillasmaiz share_tortillasharina share_panblanco share_pansandwich share_cerveza share_tequila
+foreach var in share_tortillasmaiz share_tortillasharina share_panblanco share_pansandwich share_cerveza share_tequila share_gastoOtros {
+local lbl: variable label `var'
+twoway lpoly `var' ln_gastotal  , ///
+ytitle("`lbl'") xtitle("log(gasto)") ///
+legend(off) ///
+name("graph_q`var'", replace)
+}
+
+graph combine graph_qshare_tortillasmaiz graph_qshare_tortillasharina graph_qshare_panblanco graph_qshare_pansandwich graph_qshare_cerveza graph_qshare_tequila graph_qshare_gastoOtros
+
+
+
+* QUAIDS ---------------------------------------------------------------------------------------------------------------------------
+
 quaids share_gastoA004 share_gastoA008 share_gastoA012 share_gastoA015 share_gastoA224 share_gastoA233 share_gastoOtros, anot(10) prices(precioA004 precioA008 precioA012 precioA015 precioA224 precioA233 precioOtros) expenditure(gastototal) demographics(counter rural) nolog
 
 
