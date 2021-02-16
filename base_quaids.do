@@ -150,6 +150,9 @@ name("graph_q`var'", replace)
 graph combine graph_qshare_tortillasmaiz graph_qshare_tortillasharina graph_qshare_panblanco graph_qshare_pansandwich graph_qshare_cerveza graph_qshare_tequila graph_qshare_gastoOtros
 
 
+* tabla estadística descriptiva
+estpost sum share_*, detail
+estout using shares_descr.tex, cells("mean sd min p25 p50 p75 max") replace
 
 * QUAIDS ---------------------------------------------------------------------------------------------------------------------------
 
