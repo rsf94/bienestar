@@ -156,4 +156,46 @@ graph combine graph_qshare_tortillasmaiz graph_qshare_tortillasharina graph_qsha
 quaids share_gastoA004 share_gastoA008 share_gastoA012 share_gastoA015 share_gastoA224 share_gastoA233 share_gastoOtros, anot(10) prices(precioA004 precioA008 precioA012 precioA015 precioA224 precioA233 precioOtros) expenditure(gastototal) demographics(counter rural) nolog
 
 
-*Funciona, pero tarda muchísimo en correr
+
+*Elasticidades
+
+*Precio no compensada
+estat uncompensated, atmeans
+matrix up=r(uncompelas)
+estat uncompensated if rural, atmeans
+matrix uprural=r(uncompelas)
+estat uncompensated if !rural, atmeans
+matrix upurban=r(uncompelas)
+
+esttab matrix(uprural) using "$directorio/elasticidades", tex replace
+esttab matrix(upurban) using "$directorio/elasticidades", tex append
+esttab matrix(up) using "$directorio/elasticidades", tex append
+
+
+
+*Precio compensada
+
+estat compensated, atmeans
+matrix cp=r(compelas)
+estat compensated if rural, atmeans
+matrix cprural=r(compelas)
+estat compensated if !rural, atmeans
+matrix cpurban=r(compelas)
+
+esttab matrix(cprural) using "$directorio/elasticidades", tex append
+esttab matrix(cpurban) using "$directorio/elasticidades", tex append
+esttab matrix(cp) using "$directorio/elasticidades", tex append
+
+*Ingreso
+
+estat expenditure, atmeans
+matrix ex=r(expelas)
+estat expenditure if rural, atmeans
+matrix exrural=r(expelas)
+estat expenditure if !rural, atmeans
+matrix exurban=r(expelas)
+
+esttab matrix(exrural) using "$directorio/elasticidades", tex append
+esttab matrix(exurban) using "$directorio/elasticidades", tex append
+esttab matrix(ex) using "$directorio/elasticidades", tex append
+
