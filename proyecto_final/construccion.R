@@ -63,7 +63,7 @@ check_nas(a)
 # JOIN características de hogares
 data <- left_join(data_ind,data_hogar,by="id_hogar")
 
-write.csv(data, file.path(data_path,"base.csv"))
+write.csv(data, file.path(data_clean,"base.csv"))
 
 #data <- svydesign(id = ~ code_upm,
 #                  weights = ~ ponde_ss,
