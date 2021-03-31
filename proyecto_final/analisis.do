@@ -70,6 +70,14 @@ replace estudia=0 if ds8<3
 
 tab estudia [aw=ponde_ss]
 
+* edad_estudiar: 1 si la persona tiene menos de 2_ años
+gen edad_estudiar = 1 if edad <= 20
+replace edad_estudiar = 0 if edad > 20
+
+* desempleo si lleva más de 46 días desempleado (ds15) (requisito para retirar  de tu AFORE)
+gen desempleo = 1 if ds15 > 46 & ds10==2
+replace desempleo = 0 if ds10==1
+
 * tb02: fuma
 gen fuma = 1 if tb02<=2
 replace fuma = 0 if tb02>2
@@ -91,5 +99,15 @@ gen prevencion = 1 if pc1==1
 replace prevencion = 0 if pc1 >1
 
 * =================================
-* RELACIONES BÁSICAS ENTRE VARIABLES
+* RELACIONES ENTRE VARIABLES
 * =================================
+
+* Estudia Y está en edad de estudiar
+tab edad_estudiar estudia [aw=ponde_ss], cell
+
+* Desempleados si están en edad de estudiar
+ tab desempleo edad_estudiar
+
+ 
+ * Histograma edad
+ hist edad, bin(10)
