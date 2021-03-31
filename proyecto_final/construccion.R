@@ -1,11 +1,11 @@
 # -------------
-# Preparación
+# PreparaciÃ³n
 # -------------
 
 packages <- c(
   "dplyr",
   "tidyr",
-  'naniar',
+  'naniar'
 )
 
 # instala los que no tengas
@@ -32,12 +32,12 @@ check_nas <- function(df){
 # Cargar datos
 # -------------
 
-data_path <- file.path("C:/Users/rsf94/Google Drive/MAESTRÍA ITAM/2do semestre/Bienestar y política social/Bienestar_equipo/trabajo_final/data_raw")
-data_clean <- file.path("C:/Users/rsf94/Google Drive/MAESTRÍA ITAM/2do semestre/Bienestar y política social/Bienestar_equipo/trabajo_final/data_clean")
+data_path <- file.path("C:/Users/rsf94/Google Drive/MAESTRÃA ITAM/2do semestre/Bienestar y polÃ­tica social/Bienestar_equipo/trabajo_final/data_raw")
+data_clean <- file.path("C:/Users/rsf94/Google Drive/MAESTRÃA ITAM/2do semestre/Bienestar y polÃ­tica social/Bienestar_equipo/trabajo_final/data_clean")
 
-data_ind<-read.csv(file.path(data,"ENCODAT 2016_2017.csv"))
+data_ind<-read.csv(file.path(data_path,"ENCODAT 2016_2017.csv"))
 
-data_hogar <- read.csv(file.path(data,"ponde_Hogar_ENA_2016_pp.csv"))
+data_hogar <- read.csv(file.path(data_path,"ponde_Hogar_ENA_2016_pp.csv"))
 
 str(data_ind)
 str(data_hogar)
@@ -54,16 +54,16 @@ check_nas(data_ind) %>% filter(pct_miss>90)
 length(data_ind)
 nrow(check_nas(data_ind) %>% filter(pct_miss>90))
 
-# primer análisis
+# primer anÃ¡lisis
 a <- data_ind %>% select(c(ds8, ds10, ds15, dp5, ds14, ed1, ed5, ts9a, tb02, di6b, di8b))
 
 check_nas(a) 
 
 
-# JOIN características de hogares
+# JOIN caracterÃ­sticas de hogares
 data <- left_join(data_ind,data_hogar,by="id_hogar")
 
-write.csv(data, file.path(data_path,"base.csv"))
+write.csv(data, file.path(data_clean,"base.csv"))
 
 #data <- svydesign(id = ~ code_upm,
 #                  weights = ~ ponde_ss,
