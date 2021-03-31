@@ -1,14 +1,32 @@
 clear
 set more off
 
-* Importar base previamente limpiada en R
-import delimited "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final\data_clean\base.csv"
+global data "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final\data_raw"
+
+* =================================
+* CARGAR DATOS
+* =================================
+* Abro base de hogares y guardo en formato de Stata para el merge
+import delimited "$data\ponde_Hogar_ENA_2016_pp.csv"
+rename ïid_hogar id_hogar
+save "$data\hogares.dta",replace
+
+clear
+
+* Importar bases de datos: individuos y hogares
+import delimited "$data\ENCODAT 2016_2017.csv"
+split id_pers, parse()
+rename id_pers1 id_hogar
+rename id_pers2 id_ind
+
+* Merge entre base de individuos y hogares
+merge m:1 id_hogar using "$data\hogares.dta"
+replace id_ind = "1" if _merge==1
+keep if _merge != 2
 
 * =================================
 * LIMPIEZA DE DATOS
 * =================================
-drop entidadx
-rename entidady entidad
 
 
 * =================================
@@ -42,7 +60,9 @@ rename h315 ingreso
 
 * faltan las preguntas asociadas a trabajo
 
+
 * ------ Tratamiento y respuesta
+
 * ds8: actualmente estudia
 tab ds8 [aw=ponde_ss]
 gen estudia =1 if ds8==3
