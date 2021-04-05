@@ -2469,6 +2469,26 @@ replace no_pobv1=. if pobreza==.
 
 tabstat pobres2 ok [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s)
 
+***Comparacion con logit
+
+logit pobreza carencias3 ic_riqueza
+predict predictriqueza
+gen norico_logit=.
+replace norico_logit=1 if predictriqueza<.5 
+replace norico_logit=0 if predictriqueza>=.5 
+gen coincidente1=1 if plb==ic_riqueza
+replace coincidente1=0 if plb!=ic_riqueza 
+gen coincidente2=1 if pobreza==norico_logit
+replace coincidente2=0 if pobreza!=norico_logit
+
+prop coincidente1 [w=factor] 
+prop coincidente2 [w=factor] 
+
+
+tab pobres2 pobreza [w=factor] , col row
+tab  norico_logit pobreza [w=factor] , col row
+
+
 *Histograma y curva de Lorenz
 
 histogram riq_persona [fw=factor], percent bin(600) bcolor(red%70) /// 
