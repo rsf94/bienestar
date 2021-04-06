@@ -2472,6 +2472,8 @@ tabstat pobres2 ok [w=factor] if pobreza!=., stats(mean sum) format(%15.8gc) c(s
 ***Comparacion con logit
 
 logit pobreza carencias3 ic_riqueza
+estat class
+
 predict predictriqueza
 gen norico_logit=.
 replace norico_logit=1 if predictriqueza<.5 
