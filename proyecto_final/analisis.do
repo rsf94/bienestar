@@ -1,6 +1,8 @@
 clear
 set more off
 
+log using proyecto_final.log, replace
+
 global data "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final\data_raw"
 
 * =================================
@@ -98,6 +100,53 @@ replace facilidad = 0 if ed11 <4
 gen prevencion = 1 if pc1==1
 replace prevencion = 0 if pc1 >1
 
+* //////////// Drogas médicas
+
+* dm1 : ¿Ha tomado, usado o probado...?
+* dm3 : ¿Cómo ha usado? (sin receta, etc)
+* dm4 : edad de primera vez
+* dm5 : Cuántas veces en su vida ha usado?
+* dm6 : Ha usado __ fuera de prescripción médica en los últimos 12 meses?
+* dm8 : Ha consumido en últimos 30 días
+	* a Opiáceos
+	* b Tranquilizantes
+	* c Sedantes y Barbitúricos
+	* d Anfetaminas
+	tab1 dm1a dm1b dm1c dm1d
+	tab1 dm3a dm3b dm3c dm3d
+
+	tab dm6a dm3a
+	
+	
+
+* //////////// Drogas ilegales
+
+* di1 : ¿Ha tomado, usado, probado?
+
+
+
+	* a Marihuana
+	* b Cocaína
+	* c Crack/piedra
+	* d Alucinógenos
+	* e Inhalables
+	* f Heroína
+	* g Anfetaminas: tachas, cristal, etc
+	* h Ketamina (extásis líquido)
+	* i Marihuana sintética
+	
+* dp5 : ¿Cuántos días en los últimos 12 meses fue totalmente incapaz de trabajar o de hacer sus actividades habituales, debido a su consumo de esta sustancia ?
+
+* //////////// Dependencia a drogas 
+
+* dd1 : 
+* dd5
+* dd6
+* dd7
+
+* //////////// Alcohol (AL)
+
+
 * =================================
 * RELACIONES ENTRE VARIABLES
 * =================================
@@ -111,3 +160,6 @@ tab edad_estudiar estudia [aw=ponde_ss], cell
  
  * Histograma edad
  hist edad, bin(10)
+ 
+ close log
+ clear
