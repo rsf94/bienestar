@@ -58,6 +58,7 @@ import delimited "/Users/marcelo/Google Drive/WJP/OSF Oaxaca/Municipal-Delitos-2
 keep if año>=2015 & año<=2017
 drop bienjurídicoafectado modalidad
 keep if tipodedelito=="Homicidio" | tipodedelito=="Feminicidio" 
+
 *
 *ALGUN OTRO DELITO?
 *
@@ -158,19 +159,20 @@ replace prevencion = 0 if pc1 >1
 	* b Tranquilizantes
 	* c Sedantes y Barbitúricos
 	* d Anfetaminas
+	
+gen consumo_medicas = 1 if dm1a == 1 | dm1b == 1 | dm1c == 1 | dm1d == 1 & dm8a == 1 | dm8b == 1 | dm8c == 1 | dm8d == 1
+replace consumo_medicas = 2 if dm1a == 2 & dm1b == 2 & dm1c == 2 & dm1d == 2 & dm8a == 2 & dm8b == 2 & dm8c == 2 & dm8d == 1
+	
 	tab1 dm1a dm1b dm1c dm1d
 	tab1 dm3a dm3b dm3c dm3d
 
-	tab dm6a dm3a
+	tab dm6a
 	
 	
 
 * //////////// Drogas ilegales
 
 * di1 : ¿Ha tomado, usado, probado?
-
-
-
 	* a Marihuana
 	* b Cocaína
 	* c Crack/piedra
@@ -180,6 +182,15 @@ replace prevencion = 0 if pc1 >1
 	* g Anfetaminas: tachas, cristal, etc
 	* h Ketamina (extásis líquido)
 	* i Marihuana sintética
+	
+	
+* Agrupemos a las drogas en 2: Marihuana e inhalables Y las demás que són "peores"
+
+gen consumo_marihuana
+
+
+gen consumo_pesadas
+										
 	
 * dp5 : ¿Cuántos días en los últimos 12 meses fue totalmente incapaz de trabajar o de hacer sus actividades habituales, debido a su consumo de esta sustancia ?
 
@@ -206,6 +217,13 @@ tab edad_estudiar estudia [aw=ponde_ss], cell
  
  * Histograma edad
  hist edad, bin(10)
+ 
+* =================================
+* MISSING VALUES
+* =================================
+* Veamos comportamiento por región
+
+tab entidad di1a, row nofreq
  
  close log
  clear
