@@ -89,12 +89,12 @@ rename IM indice_marginacion
 rename GM grado_marginacion
 
 *violencia
-gen tasa_feminicidios_1517= (total_Feminicidio2015+total_Feminicidio2016+total_Feminicidio2017)/(3*POB_TOT)
-gen tasa_homicidioscul_1517= (total_Homicidio_doloso2015+total_Homicidio_doloso2016+total_Homicidio_doloso2017)/(3*POB_TOT)
-gen tasa_homicidiosdol_1517= (total_Homicidio_culposo2015+total_Homicidio_culposo2016+total_Homicidio_culposo2017)/(3*POB_TOT)
-replace tasa_homicidiosdol_1517= total_Homicidio_doloso2017 if tasa_homicidiosdol_1517==.
-replace tasa_homicidioscul_1517=total_Homicidio_culposo2017 if tasa_homicidioscul_1517==.
-replace tasa_feminicidios_1517=total_Feminicidio2017 if tasa_feminicidios_1517==.
+gen tasa_feminicidios_1517= 100000*(total_Feminicidio2015+total_Feminicidio2016+total_Feminicidio2017)/(3*POB_TOT)
+gen tasa_homicidioscul_1517= 100000*(total_Homicidio_doloso2015+total_Homicidio_doloso2016+total_Homicidio_doloso2017)/(3*POB_TOT)
+gen tasa_homicidiosdol_1517= 100000*(total_Homicidio_culposo2015+total_Homicidio_culposo2016+total_Homicidio_culposo2017)/(3*POB_TOT)
+replace tasa_homicidiosdol_1517= 100000*total_Homicidio_doloso2017/POB_TOT  if tasa_homicidiosdol_1517==.
+replace tasa_homicidioscul_1517=100000*total_Homicidio_culposo2017/POB_TOT  if tasa_homicidioscul_1517==.
+replace tasa_feminicidios_1517=100000*total_Feminicidio2017/POB_TOT if tasa_feminicidios_1517==.
 
 * ------ Sociodemográficas
 * ds2: sexo
