@@ -49,7 +49,7 @@ import dbase using "$data/Mapa_de_grado_de_marginacion_por_municipio_2015/IMM_20
 save "marginacion.dta", replace
 
 use `base'
-merge m:1 CVE_MUN using "marginacion.dta", nogen keep(1 3)
+merge m:1 CVE_MUN using "marginacion.dta", nogen keep(1 3) keepusing(POB_TOT IM GM)
 tempfile base2
 save `base2'
 
@@ -58,7 +58,6 @@ import delimited "/Users/marcelo/Google Drive/WJP/OSF Oaxaca/Municipal-Delitos-2
 keep if año>=2015 & año<=2017
 drop bienjurídicoafectado modalidad
 keep if tipodedelito=="Homicidio" | tipodedelito=="Feminicidio" 
-
 *
 *ALGUN OTRO DELITO?
 *
@@ -81,6 +80,21 @@ merge m:1 CVE_MUN using `baseSESNSP', nogen keep(1 3)
 * =================================
 * GENERAMOS VARIABLES DE INTERÉS
 * =================================
+
+
+* ------ De contexto
+
+*marginacion
+rename IM indice_marginacion
+rename GM grado_marginacion
+
+*violencia
+gen tasa_feminicidios_1517= (total_Feminicidio2015+total_Feminicidio2016+total_Feminicidio2017)/(3*POB_TOT)
+gen tasa_homicidioscul_1517= (total_Homicidio_doloso2015+total_Homicidio_doloso2016+total_Homicidio_doloso2017)/(3*POB_TOT)
+gen tasa_homicidiosdol_1517= (total_Homicidio_culposo2015+total_Homicidio_culposo2016+total_Homicidio_culposo2017)/(3*POB_TOT)
+replace tasa_homicidiosdol_1517= total_Homicidio_doloso2017 if tasa_homicidiosdol_1517==.
+replace tasa_homicidioscul_1517=total_Homicidio_culposo2017 if tasa_homicidioscul_1517==.
+replace tasa_feminicidios_1517=total_Feminicidio2017 if tasa_feminicidios_1517==.
 
 * ------ Sociodemográficas
 * ds2: sexo
