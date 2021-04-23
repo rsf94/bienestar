@@ -30,7 +30,7 @@ drop _merge
 gen CVE_MUN=substr(desc_ent,1,2)+substr(desc_mun,1,3)
 
 tempfile base
-save`base'
+save `base'
 
 
 
@@ -54,7 +54,7 @@ tempfile base2
 save `base2'
 
 
-import delimited "/Users/marcelo/Google Drive/WJP/OSF Oaxaca/Municipal-Delitos-2015-2020_abr2020/IDM_NM_jun2020.csv", encoding(ISO-8859-1) clear
+import delimited "$data/IDM_NM_jun2020.csv", encoding(ISO-8859-1) clear
 keep if año>=2015 & año<=2017
 drop bienjurídicoafectado modalidad
 keep if tipodedelito=="Homicidio" | tipodedelito=="Feminicidio" 
@@ -159,17 +159,14 @@ replace prevencion = 0 if pc1 >1
 	* b Tranquilizantes
 	* c Sedantes y Barbitúricos
 	* d Anfetaminas
-	
-gen consumo_medicas = 1 if dm1a == 1 | dm1b == 1 | dm1c == 1 | dm1d == 1 & dm8a == 1 | dm8b == 1 | dm8c == 1 | dm8d == 1
-replace consumo_medicas = 2 if dm1a == 2 & dm1b == 2 & dm1c == 2 & dm1d == 2 & dm8a == 2 & dm8b == 2 & dm8c == 2 & dm8d == 1
-	
-	tab1 dm1a dm1b dm1c dm1d
-	tab1 dm3a dm3b dm3c dm3d
 
-	tab dm6a
-	
-	
+* Variable que indica si la persona ha consumido alguna droga médica sin receta en los últimos 12 meses
+gen consumo_medicas = 1 if dm6a == 1 | dm6b == 1 | dm6c == 1 | dm6d == 1
+replace consumo_medicas = 0 if dm6a != 1 & dm6b != 1 & dm6c != 1 & dm6d != 1
 
+tab entidad consumo_medicas, row nofreq
+
+	
 * //////////// Drogas ilegales
 
 * di1 : ¿Ha tomado, usado, probado?
@@ -186,7 +183,10 @@ replace consumo_medicas = 2 if dm1a == 2 & dm1b == 2 & dm1c == 2 & dm1d == 2 & d
 	
 * Agrupemos a las drogas en 2: Marihuana e inhalables Y las demás que són "peores"
 
+* Variable que indica si la persona ha consumido marihuana o derivados en los últimos 12 meses
 gen consumo_marihuana
+
+gen consumo_cocaina
 
 
 gen consumo_pesadas
@@ -202,6 +202,9 @@ gen consumo_pesadas
 * dd7
 
 * //////////// Alcohol (AL)
+
+
+
 
 
 * =================================
@@ -224,6 +227,10 @@ tab edad_estudiar estudia [aw=ponde_ss], cell
 * Veamos comportamiento por región
 
 tab entidad di1a, row nofreq
+tab entidad di1b, row nofreq
+
+
+
  
  close log
  clear
