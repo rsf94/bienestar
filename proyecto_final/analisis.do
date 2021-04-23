@@ -81,6 +81,7 @@ merge m:1 CVE_MUN using `baseSESNSP', nogen keep(1 3)
 * GENERAMOS VARIABLES DE INTERÉS
 * =================================
 
+svyset code_upm [pweight=ponde_ss]
 
 * ------ De contexto
 
@@ -134,8 +135,8 @@ replace estudia=0 if ds8<3
 tab estudia [aw=ponde_ss]
 
 * edad_estudiar: 1 si la persona tiene menos de 2_ años
-gen edad_estudiar = 1 if edad <= 20
-replace edad_estudiar = 0 if edad > 20
+gen edad_estudiar = 1 if edad <= 22
+replace edad_estudiar = 0 if edad > 22
 
 * desempleo si lleva más de 46 días desempleado (ds15) (requisito para retirar  de tu AFORE)
 gen desempleo = 1 if ds15 > 46 & ds10==2
@@ -160,6 +161,10 @@ replace facilidad = 0 if ed11 <4
 * pc1: platica de prevencion
 gen prevencion = 1 if pc1==1
 replace prevencion = 0 if pc1 >1
+
+* pc3 lugar de pláticas de prevención
+gen prevencion_escuela = 1 if pc3==1
+replace prevencion_escuela = 0 if pc3!=1
 
 * //////////// Drogas médicas
 
@@ -198,12 +203,15 @@ tab entidad consumo_medicas, row nofreq
 * Agrupemos a las drogas en 2: Marihuana e inhalables Y las demás que són "peores"
 
 * Variable que indica si la persona ha consumido marihuana o derivados en los últimos 12 meses
-gen consumo_marihuana
+gen consumo_marihuana = 1 if di6a==1
+replace consumo_marihuana =0 if di6a !=1
 
-gen consumo_cocaina
 
+gen consumo_cocaina = 1 if di6b==1
+replace consumo_cocaina =0 if di6b !=1
 
-gen consumo_pesadas
+gen consumo_pesadas = 1 if di6c==1 | di6d==1 | di6e==1 | di6f==1 | di6g==1 | di6h==1
+replace consumo_pesadas =0 if di6c!=1 & di6d!=1 & di6e!=1 & di6f!=1 & di6g!=1 & di6h!=1
 										
 	
 * dp5 : ¿Cuántos días en los últimos 12 meses fue totalmente incapaz de trabajar o de hacer sus actividades habituales, debido a su consumo de esta sustancia ?
@@ -217,9 +225,10 @@ gen consumo_pesadas
 
 * //////////// Alcohol (AL)
 
+gen alcoholismo = 1 if al8 <= 5
+replace alcoholismo =0 if al8>5
 
-
-
+gen homicidios_doloso_promedio = (total_Homicidio_doloso2015 + total_Homicidio_doloso2016 + total_Homicidio_doloso2017)/3
 
 * =================================
 * RELACIONES ENTRE VARIABLES
@@ -239,12 +248,70 @@ tab edad_estudiar estudia [aw=ponde_ss], cell
 * MISSING VALUES
 * =================================
 * Veamos comportamiento por región
+* ver documento metodológico
+
 
 tab entidad di1a, row nofreq
 tab entidad di1b, row nofreq
 
 
+* =================================
+* MODELO 1 : PROBIT
+* =================================
+* Nos querdamos con población en edad de estudiar?
 
+local indep consumo_marihuana consumo_cocaina
+probit estudia `indep' if edad_estudiar==1
+estimates store m1
  
+local indep consumo_marihuana consumo_cocaina consumo_medicas
+probit estudia `indep' if edad_estudiar==1
+estimates store m2
+
+local indep consumo_marihuana consumo_cocaina  consumo_pesadas
+probit estudia `indep' if edad_estudiar==1
+estimates store m3
+
+local indep consumo_marihuana consumo_cocaina consumo_medicas consumo_pesadas
+probit estudia `indep' if edad_estudiar==1
+estimates store m4 
+
+local indep consumo_marihuana consumo_cocaina   mujer 
+probit estudia `indep' if edad_estudiar==1
+estimates store m5   
+ 
+local indep consumo_marihuana consumo_cocaina   mujer indice_marginacion
+probit estudia `indep' if edad_estudiar==1
+estimates store m6   
+ 
+local indep consumo_marihuana consumo_cocaina   mujer indice_marginacion tasa_homicidiosdol_1517
+probit estudia `indep' if edad_estudiar==1
+estimates store m7 
+
+local indep consumo_marihuana consumo_cocaina   mujer indice_marginacion homicidios_doloso_promedio 
+probit estudia `indep' if edad_estudiar==1
+estimates store m8 
+ 
+esttab m*,nobaselevels label
+ 
+/* menú de variables dependientes pa elegir
+
+indep_m1 mujer edad matrimonio ingreso prospera_mon prospera_bec fuma regalo facilidad prevencion prevencion_escuela consumo_medicas consumo_marihuana consumo_cocaina consumo_pesadas alcoholismo mujer edad matrimonio ingreso prospera_mon prospera_bec fuma regalo facilidad prevencion prevencion_escuela consumo_medicas consumo_marihuana consumo_cocaina consumo_pesadas alcoholismo 
+
+indice_marginacion grado_marginacion
+
+total_Feminicidio2015
+total_Homicidio_culposo2015 
+total_Homicidio_doloso2015
+total_Feminicidio2016
+total_Homicidio_culposo2016 
+total_Homicidio_doloso2016
+total_Feminicidio2017
+total_Homicidio_culposo2017 
+total_Homicidio_doloso2017
+tasa_feminicidios_1517
+tasa_homicidioscul_1517
+tasa_homicidiosdol_1517
+*/ 
  close log
  clear
