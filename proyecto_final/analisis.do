@@ -5,10 +5,9 @@ log using proyecto_final.log, replace
 
 global data "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final\data_raw"
 
-
-* =================================
+* ==================================================================
 * CARGAR DATOS
-* =================================
+* ==================================================================
 * Abro base de hogares y guardo en formato de Stata para el merge
 import delimited "$data/ponde_Hogar_ENA_2016_pp.csv", clear
 rename ïid_hogar id_hogar
@@ -32,18 +31,9 @@ gen CVE_MUN=substr(desc_ent,1,2)+substr(desc_mun,1,3)
 tempfile base
 save `base'
 
-
-
-* =================================
-* LIMPIEZA DE DATOS
-* =================================
-
-
-
-
-* =================================
+* ==================================================================
 * PEGAR MARGINACION Y VIOLENCIA
-* =================================
+* ==================================================================
 
 import dbase using "$data/Mapa_de_grado_de_marginacion_por_municipio_2015/IMM_2015/IMM_2015.dbf", clear
 save "marginacion.dta", replace
@@ -77,13 +67,11 @@ save `baseSESNSP'
 use `base2'
 merge m:1 CVE_MUN using `baseSESNSP', nogen keep(1 3)
 
-* =================================
+* ==================================================================
 * GENERAMOS VARIABLES DE INTERÉS
-* =================================
-
+* ==================================================================
+* definimos base como datos tipo encuesta
 svyset code_upm [pweight=ponde_ss]
-
-* ------ De contexto
 
 *marginacion
 rename IM indice_marginacion
@@ -109,15 +97,38 @@ rename ds3 edad
 gen matrimonio = 1 if ds6 ==1
 replace matrimonio = 0 if ds6>1
 
-* ds7: religion
+* ds5 habla lengua indígena
+rename ds5 habla_indigena
+
+* ds5a usted se considera indígena
+rename ds5a indigena
+
+* ds7: religion sí incluir
+gen alguna_religion = 1 if ds7 ==1 | ds7 ==2 | ds7 ==3 | ds7 ==4 | ds7 ==5
+replace alguna_religion = 0 if ds7==6
+
+rename ds7 religion
+
+* padres juntos
+
+* jefe de hogar
+rename h312a grado_jefe
+
+label define name_grado 0 "Ninguno" 1 "Preescolar o Kinder" 2 "Primaria" 3 "Secundaria" 4 "Secundaria tecnica" 5 "Carrera tecnica" 6 "Normal basica" 7 "Preparatoria" 8 "Carrera tecnica prepa" 9 "Normal superior" 10 "Licenciatura" 11 "Maestria" 12 "Doctorado" 99 "No responde" 88 "No sabe"
+
+label values grado_jefe name_grado
 
 * h315: ingreso autoreportado
 rename h315 ingreso
+
+* 2.1 número de personas
+rename h305 num_personas
 
 * beneficiario de programa del gobierno
 *	1. Apoyo monetario Prospera h317a
 		gen prospera_mon =1 if h317a==1
 		replace prospera_mon = 0 if h317a!=1
+		
 *	2. Apoyo becas Prospera h317b
 		gen prospera_bec = 1 if h317b==1
 		replace prospera_bec = 0 if h317b != 1
@@ -125,7 +136,7 @@ rename h315 ingreso
 * faltan las preguntas asociadas a trabajo
 
 
-* ------ Tratamiento y respuesta
+* //////////// Dependiente ////////////
 
 * ds8: actualmente estudia
 tab ds8 [aw=ponde_ss]
@@ -134,9 +145,27 @@ replace estudia=0 if ds8<3
 
 tab estudia [aw=ponde_ss]
 
-* edad_estudiar: 1 si la persona tiene menos de 2_ años
-gen edad_estudiar = 1 if edad <= 22
-replace edad_estudiar = 0 if edad > 22
+* ds9: 	¿Cuál fue el último grado que ha completado ?
+* 		creamos proxy
+gen años_estudio = 9 if ds9 == 1
+replace años_estudio = 12 if ds9 == 2
+replace años_estudio = 14 if ds9 == 3
+replace años_estudio = 15 if ds9 == 4
+replace años_estudio = 16 if ds9 == 5 
+replace años_estudio = 18 if ds9 == 6
+replace años_estudio = 20 if ds9 == 7
+replace años_estudio = 23 if ds9 == 8
+replace años_estudio = 26 if ds9 == 9
+
+* edad_estudiar: 1 si la persona tiene menos de 20 años
+gen edad_estudiar = 1 if edad <= 20
+replace edad_estudiar = 0 if edad > 20
+
+
+* diferencia edad_Estudiar - años de estudio
+gen dif_edad_añosestudio = edad - años_estudio
+
+* //////////// Independientes ////////////
 
 * desempleo si lleva más de 46 días desempleado (ds15) (requisito para retirar  de tu AFORE)
 gen desempleo = 1 if ds15 > 46 & ds10==2
@@ -147,6 +176,10 @@ gen fuma = 1 if tb02<=2
 replace fuma = 0 if tb02>2
 tab fuma [aw=ponde_ss]
 
+
+* para reducir sesgo de simultaneidad
+* Asignar edades por grado
+* Edad - edad esperada > 2 --> los tiramos
 
 * ed1: te han regalado mariguana
 * ed5: te han regalado otras drogas
@@ -166,8 +199,9 @@ replace prevencion = 0 if pc1 >1
 gen prevencion_escuela = 1 if pc3==1
 replace prevencion_escuela = 0 if pc3!=1
 
-* //////////// Drogas médicas
+* ----------------- Drogas médicas -----------------
 
+* FALTA METER LAS DE 30 DÍAS
 * dm1 : ¿Ha tomado, usado o probado...?
 * dm3 : ¿Cómo ha usado? (sin receta, etc)
 * dm4 : edad de primera vez
@@ -186,7 +220,7 @@ replace consumo_medicas = 0 if dm6a != 1 & dm6b != 1 & dm6c != 1 & dm6d != 1
 tab entidad consumo_medicas, row nofreq
 
 	
-* //////////// Drogas ilegales
+* ----------------- Drogas ilegales -----------------
 
 * di1 : ¿Ha tomado, usado, probado?
 	* a Marihuana
@@ -199,40 +233,28 @@ tab entidad consumo_medicas, row nofreq
 	* h Ketamina (extásis líquido)
 	* i Marihuana sintética
 	
-	
 * Agrupemos a las drogas en 2: Marihuana e inhalables Y las demás que són "peores"
 
 * Variable que indica si la persona ha consumido marihuana o derivados en los últimos 12 meses
 gen consumo_marihuana = 1 if di6a==1
 replace consumo_marihuana =0 if di6a !=1
 
-
 gen consumo_cocaina = 1 if di6b==1
 replace consumo_cocaina =0 if di6b !=1
 
-gen consumo_pesadas = 1 if di6c==1 | di6d==1 | di6e==1 | di6f==1 | di6g==1 | di6h==1
-replace consumo_pesadas =0 if di6c!=1 & di6d!=1 & di6e!=1 & di6f!=1 & di6g!=1 & di6h!=1
+gen consumo_menos_frecuentes = 1 if di6c==1 | di6d==1 | di6e==1 | di6f==1 | di6g==1 | di6h==1
+replace consumo_menos_frecuentes =0 if di6c!=1 & di6d!=1 & di6e!=1 & di6f!=1 & di6g!=1 & di6h!=1
 										
-	
-* dp5 : ¿Cuántos días en los últimos 12 meses fue totalmente incapaz de trabajar o de hacer sus actividades habituales, debido a su consumo de esta sustancia ?
-
-* //////////// Dependencia a drogas 
-
-* dd1 : 
-* dd5
-* dd6
-* dd7
-
-* //////////// Alcohol (AL)
+* ----------------- Alcohol (AL) -----------------
 
 gen alcoholismo = 1 if al8 <= 5
 replace alcoholismo =0 if al8>5
 
 gen homicidios_doloso_promedio = (total_Homicidio_doloso2015 + total_Homicidio_doloso2016 + total_Homicidio_doloso2017)/3
 
-* =================================
+* ==================================================================
 * RELACIONES ENTRE VARIABLES
-* =================================
+* ==================================================================
 
 * Estudia Y está en edad de estudiar
 tab edad_estudiar estudia [aw=ponde_ss], cell
@@ -244,9 +266,9 @@ tab edad_estudiar estudia [aw=ponde_ss], cell
  * Histograma edad
  hist edad, bin(10)
  
-* =================================
+* ==================================================================
 * MISSING VALUES
-* =================================
+* ==================================================================
 * Veamos comportamiento por región
 * ver documento metodológico
 
@@ -254,10 +276,11 @@ tab edad_estudiar estudia [aw=ponde_ss], cell
 tab entidad di1a, row nofreq
 tab entidad di1b, row nofreq
 
+* estadística descriptiva
 
-* =================================
-* MODELO 1 : PROBIT
-* =================================
+* ==================================================================
+* PROBANDO PROBIT
+* ==================================================================
 * Nos querdamos con población en edad de estudiar?
 
 local indep consumo_marihuana consumo_cocaina
@@ -313,5 +336,10 @@ tasa_feminicidios_1517
 tasa_homicidioscul_1517
 tasa_homicidiosdol_1517
 */ 
+
+* ==================================================================
+* PROBANDO PROBIT
+* ==================================================================
+
  close log
  clear
