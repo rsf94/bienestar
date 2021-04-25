@@ -1,9 +1,15 @@
 clear
 set more off
 
+* estilo de gráficas
+net install scheme-burd.pkg
+set scheme burd
+graph set window fontface "Times New Roman"
+
 log using proyecto_final.log, replace
 
 global data "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final\data_raw"
+global graphs "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final\graphs"
 
 * ==================================================================
 * CARGAR DATOS
@@ -158,12 +164,14 @@ replace años_estudio = 23 if ds9 == 8
 replace años_estudio = 26 if ds9 == 9
 
 * edad_estudiar: 1 si la persona tiene menos de 20 años
-gen edad_estudiar = 1 if edad <= 20
-replace edad_estudiar = 0 if edad > 20
+gen edad_estudiar = 1 if edad <= 22
+replace edad_estudiar = 0 if edad > 22
+
 
 
 * diferencia edad_Estudiar - años de estudio
 gen dif_edad_añosestudio = edad - años_estudio
+
 
 * //////////// Independientes ////////////
 
@@ -217,6 +225,10 @@ replace prevencion_escuela = 0 if pc3!=1
 gen consumo_medicas = 1 if dm6a == 1 | dm6b == 1 | dm6c == 1 | dm6d == 1
 replace consumo_medicas = 0 if dm6a != 1 & dm6b != 1 & dm6c != 1 & dm6d != 1
 
+* 30 dias
+gen consumo_medicas_30 = 1 if dm8a <4
+replace consumo_medicas_30 = 0 if dm8a == 4
+
 tab entidad consumo_medicas, row nofreq
 
 	
@@ -238,12 +250,20 @@ tab entidad consumo_medicas, row nofreq
 * Variable que indica si la persona ha consumido marihuana o derivados en los últimos 12 meses
 gen consumo_marihuana = 1 if di6a==1
 replace consumo_marihuana =0 if di6a !=1
+gen consumo_marihuana_30 = 1 if di8a < 4
+replace consumo_marihuana_30 = 0 if di8a == 4
 
 gen consumo_cocaina = 1 if di6b==1
 replace consumo_cocaina =0 if di6b !=1
+gen consumo_cocaina_30 = 1 if di8b < 4
+replace consumo_cocaina_30 =0 if di8b == 4
 
 gen consumo_menos_frecuentes = 1 if di6c==1 | di6d==1 | di6e==1 | di6f==1 | di6g==1 | di6h==1
 replace consumo_menos_frecuentes =0 if di6c!=1 & di6d!=1 & di6e!=1 & di6f!=1 & di6g!=1 & di6h!=1
+
+gen consumo_menos_frecuentes_30 = 1 if di8c < 4 | di8d < 4  | di8e < 4  | di8f < 4 | di8g < 4  | di8h < 4 
+replace consumo_menos_frecuentes_30 = 0 if di8c == 4 | di8d == 4  | di8e == 4  | di8f == 4 | di8g == 4  | di8h == 4 
+										
 										
 * ----------------- Alcohol (AL) -----------------
 
@@ -252,19 +272,36 @@ replace alcoholismo =0 if al8>5
 
 gen homicidios_doloso_promedio = (total_Homicidio_doloso2015 + total_Homicidio_doloso2016 + total_Homicidio_doloso2017)/3
 
+
 * ==================================================================
-* RELACIONES ENTRE VARIABLES
+* FILTRADO DE BASE
+* ==================================================================
+* OJO: quitamos individuos que tienen más de 3 años de diferencia en la variable anterior
+
+keep if dif_edad_añosestudio <4 & edad_estudiar==1
+
+* ==================================================================
+* ESTADISTICA DESCRIPTIVA
 * ==================================================================
 
 * Estudia Y está en edad de estudiar
-tab edad_estudiar estudia [aw=ponde_ss], cell
+tab estudia [iweight=ponde_ss]
 
-* Desempleados si están en edad de estudiar
- tab desempleo edad_estudiar
-
- 
- * Histograma edad
+* Histograma edad
  hist edad, bin(10)
+
+* Porcentaje de mujeres y hombres que estudian
+ * base balanceada por geénero: SI 
+tab  estudia mujer [iweight=ponde_ss], row nofreq
+
+* dentro de gente casada
+tab estudia matrimonio [iweight=ponde_ss], row nofreq
+
+
+* //////////// Gráficas ////////////
+
+graph bar [pweight = ponde_ss], over(edad) ytitle("Frecuencia relativa (%)") b1title("Edad") note("Elaboración propia con datos de la ENCODAT 2016")
+graph export "$graphs/edades.pdf", replace
  
 * ==================================================================
 * MISSING VALUES
@@ -272,11 +309,9 @@ tab edad_estudiar estudia [aw=ponde_ss], cell
 * Veamos comportamiento por región
 * ver documento metodológico
 
-
 tab entidad di1a, row nofreq
 tab entidad di1b, row nofreq
 
-* estadística descriptiva
 
 * ==================================================================
 * PROBANDO PROBIT
