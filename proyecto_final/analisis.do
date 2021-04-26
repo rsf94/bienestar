@@ -407,3 +407,35 @@ tasa_homicidiosdol_1517
 
  close log
  clear
+ 
+ *Graficas 
+ graph pie, over(droga_12meses) plabel(_all percent, format("%2.1f")) title("Drogas consumidas en los últimos 12 meses ") note("La categoría “menos frecuentes” es la compilación de aquellas drogas ilegales que por sí solas no son muy frecuentes.")
+
+graph export 12m.pdf
+
+graph pie, over(droga_30dias) plabel(_all percent, format("%2.1f")) title("Drogas consumidas en los últimos 30 días") note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes.")
+
+graph export 30d.pdf
+
+graph pie, over(droga_30dias) plabel(_all percent, format("%2.1f")) by(mujer, title("Drogas consumidas en los últimos 30 días") note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes."))
+
+graph pie, over(droga_12meses) plabel(_all percent, format("%2.1f")) by(mujer, title("Drogas consumidas en los últimos 12 meses") note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes."))
+
+graph bar, ///
+over(droga_12meses) ///
+title("Drogas consumidas en los últimos 12 meses")
+graph export 12mbars.pdf
+
+graph bar, ///
+over(droga_12meses) ///
+title("Drogas consumidas en los últimos 12 meses")
+graph export 30dbars.pdf
+
+graph bar, ///
+over(droga_30dias) ///
+by(mujer, title("Drogas consumidas en los últimos 30 dias"))
+
+graph bar, ///
+over(droga_12meses) ///
+by(mujer, title("Drogas consumidas en los últimos 12 meses"))
+
