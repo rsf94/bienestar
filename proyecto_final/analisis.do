@@ -8,8 +8,11 @@ graph set window fontface "Times New Roman"
 
 log using proyecto_final.log, replace
 
-global data "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final\data_raw"
-global graphs "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final\graphs"
+global path "C:\Users\rsf94\Google Drive\MAESTRÍA ITAM\2do semestre\Bienestar y política social\Bienestar_equipo\trabajo_final"
+
+global data "$path\data_raw"
+global graphs "$path\graphs"
+global tables "$path\tables"
 
 * ==================================================================
 * CARGAR DATOS
@@ -105,9 +108,12 @@ replace matrimonio = 0 if ds6>1
 
 * ds5 habla lengua indígena
 rename ds5 habla_indigena
+replace habla_indigena = 0 if habla_indigena == 2
 
 * ds5a usted se considera indígena
 rename ds5a indigena
+replace indigena = 0 if indigena == 2
+
 
 * ds7: religion sí incluir
 gen alguna_religion = 1 if ds7 ==1 | ds7 ==2 | ds7 ==3 | ds7 ==4 | ds7 ==5
@@ -283,6 +289,27 @@ keep if dif_edad_añosestudio <4 & edad_estudiar==1
 * ==================================================================
 * ESTADISTICA DESCRIPTIVA
 * ==================================================================
+
+gen droga_12meses = 1 if consumo_medicas == 1
+replace droga_12meses = 2 if consumo_marihuana == 1
+replace droga_12meses = 3 if consumo_cocaina == 1
+replace droga_12meses = 4 if consumo_menos_frecuentes == 1
+
+gen droga_30dias = 1 if consumo_medicas_30 == 1
+replace droga_30dias = 2 if consumo_marihuana_30 == 1
+replace droga_30dias = 3 if consumo_cocaina_30 == 1
+replace droga_30dias = 4 if consumo_menos_frecuentes_30 == 1
+
+label define name_drogas 1 "médicas" 2 "marihuana" 3 "cocaína" 4 "menos frecuentes" 
+label values droga_12meses name_drogas
+label values droga_30dias name_drogas
+
+estpost tabstat estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso, statistics(mean) by(droga_12meses) 
+esttab . using "$tables\descriptive_12meses.tex", cells("estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso") b(%12.2f) replace 
+
+
+estpost tabstat estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso, s(mean) by(droga_30dias) 
+esttab . using "$tables\descriptive_30dias.tex", cells("estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso") b(%12.2f) replace 
 
 * Estudia Y está en edad de estudiar
 tab estudia [iweight=ponde_ss]
