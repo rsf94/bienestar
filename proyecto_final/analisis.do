@@ -294,18 +294,20 @@ gen droga_12meses = 1 if consumo_medicas == 1
 replace droga_12meses = 2 if consumo_marihuana == 1
 replace droga_12meses = 3 if consumo_cocaina == 1
 replace droga_12meses = 4 if consumo_menos_frecuentes == 1
+replace droga_12meses = 0 if consumo_medicas == 0 &consumo_marihuana == 0 & consumo_cocaina == 0 & consumo_menos_frecuentes ==0
 
 gen droga_30dias = 1 if consumo_medicas_30 == 1
 replace droga_30dias = 2 if consumo_marihuana_30 == 1
 replace droga_30dias = 3 if consumo_cocaina_30 == 1
 replace droga_30dias = 4 if consumo_menos_frecuentes_30 == 1
+replace droga_12meses = 0 if consumo_medicas_30 == 0 &consumo_marihuana_30 == 0 & consumo_cocaina_30 == 0 & consumo_menos_frecuentes_30 ==0
 
 label define name_drogas 1 "médicas" 2 "marihuana" 3 "cocaína" 4 "menos frecuentes" 
 label values droga_12meses name_drogas
 label values droga_30dias name_drogas
 
-estpost tabstat estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso, statistics(mean) by(droga_12meses) 
-esttab . using "$tables\descriptive_12meses.tex", cells("estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso") b(%12.2f) replace 
+estpost tabstat estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso, statistics(mean) by(droga_12meses)
+esttab . using "$tables\descriptive_12meses.tex", cells("estudia(fmt(%9.1f))  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso")  replace 
 
 
 estpost tabstat estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso, s(mean) by(droga_30dias) 
