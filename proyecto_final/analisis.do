@@ -228,12 +228,14 @@ replace prevencion_escuela = 0 if pc3!=1
 	* d Anfetaminas
 
 * Variable que indica si la persona ha consumido alguna droga médica sin receta en los últimos 12 meses
-gen consumo_medicas = 1 if dm6a == 1 | dm6b == 1 | dm6c == 1 | dm6d == 1
-replace consumo_medicas = 0 if dm6a != 1 & dm6b != 1 & dm6c != 1 & dm6d != 1
+gen consumo_medicas=0
+replace consumo_medicas = 1 if dm6a == 1 | dm6b == 1 | dm6c == 1 | dm6d == 1
+
 
 * 30 dias
-gen consumo_medicas_30 = 1 if dm8a <4
-replace consumo_medicas_30 = 0 if dm8a == 4
+gen consumo_medicas_30 = 0 
+replace consumo_medicas_30 = 1 if dm8a <4
+
 
 tab entidad consumo_medicas, row nofreq
 
@@ -254,21 +256,24 @@ tab entidad consumo_medicas, row nofreq
 * Agrupemos a las drogas en 2: Marihuana e inhalables Y las demás que són "peores"
 
 * Variable que indica si la persona ha consumido marihuana o derivados en los últimos 12 meses
-gen consumo_marihuana = 1 if di6a==1
-replace consumo_marihuana =0 if di6a !=1
-gen consumo_marihuana_30 = 1 if di8a < 4
-replace consumo_marihuana_30 = 0 if di8a == 4
+gen consumo_marihuana = 0
+replace consumo_marihuana = 1 if di6a==1
+gen consumo_marihuana_30 = 0
+replace consumo_marihuana_30 = 1 if di8a < 4
 
-gen consumo_cocaina = 1 if di6b==1
-replace consumo_cocaina =0 if di6b !=1
-gen consumo_cocaina_30 = 1 if di8b < 4
-replace consumo_cocaina_30 =0 if di8b == 4
 
-gen consumo_menos_frecuentes = 1 if di6c==1 | di6d==1 | di6e==1 | di6f==1 | di6g==1 | di6h==1
-replace consumo_menos_frecuentes =0 if di6c!=1 & di6d!=1 & di6e!=1 & di6f!=1 & di6g!=1 & di6h!=1
+gen consumo_cocaina= 0
+replace consumo_cocaina = 1 if di6b==1
+gen consumo_cocaina_30 = 0
+replace consumo_cocaina_30 = 1 if di8b < 4
 
-gen consumo_menos_frecuentes_30 = 1 if di8c < 4 | di8d < 4  | di8e < 4  | di8f < 4 | di8g < 4  | di8h < 4 
-replace consumo_menos_frecuentes_30 = 0 if di8c == 4 | di8d == 4  | di8e == 4  | di8f == 4 | di8g == 4  | di8h == 4 
+
+gen consumo_menos_frecuentes =0 
+replace consumo_menos_frecuentes = 1 if di6c==1 | di6d==1 | di6e==1 | di6f==1 | di6g==1 | di6h==1
+
+gen consumo_menos_frecuentes_30 = 0 
+replace consumo_menos_frecuentes_30 = 1 if di8c < 4 | di8d < 4  | di8e < 4  | di8f < 4 | di8g < 4  | di8h < 4 
+
 										
 										
 * ----------------- Alcohol (AL) -----------------
@@ -290,19 +295,19 @@ keep if dif_edad_añosestudio <4 & edad_estudiar==1
 * ESTADISTICA DESCRIPTIVA
 * ==================================================================
 
-gen droga_12meses = 1 if consumo_medicas == 1
+gen droga_12meses = 0 
+replace droga_12meses = 1 if consumo_medicas == 1 
 replace droga_12meses = 2 if consumo_marihuana == 1
 replace droga_12meses = 3 if consumo_cocaina == 1
 replace droga_12meses = 4 if consumo_menos_frecuentes == 1
-replace droga_12meses = 0 if consumo_medicas == 0 &consumo_marihuana == 0 & consumo_cocaina == 0 & consumo_menos_frecuentes ==0
 
-gen droga_30dias = 1 if consumo_medicas_30 == 1
+gen droga_30dias = 0 
+replace droga_30dias = 1 if consumo_medicas_30 == 1
 replace droga_30dias = 2 if consumo_marihuana_30 == 1
 replace droga_30dias = 3 if consumo_cocaina_30 == 1
 replace droga_30dias = 4 if consumo_menos_frecuentes_30 == 1
-replace droga_12meses = 0 if consumo_medicas_30 == 0 &consumo_marihuana_30 == 0 & consumo_cocaina_30 == 0 & consumo_menos_frecuentes_30 ==0
 
-label define name_drogas 1 "médicas" 2 "marihuana" 3 "cocaína" 4 "menos frecuentes" 
+label define name_drogas 1 "Médicas" 2 "Marihuana" 3 "Cocaína" 4 "Menos frecuentes" 
 label values droga_12meses name_drogas
 label values droga_30dias name_drogas
 
@@ -355,11 +360,11 @@ local indep consumo_marihuana consumo_cocaina consumo_medicas
 probit estudia `indep' if edad_estudiar==1
 estimates store m2
 
-local indep consumo_marihuana consumo_cocaina  consumo_pesadas
+local indep consumo_marihuana consumo_cocaina  consumo_menos_frecuentes
 probit estudia `indep' if edad_estudiar==1
 estimates store m3
 
-local indep consumo_marihuana consumo_cocaina consumo_medicas consumo_pesadas
+local indep consumo_marihuana consumo_cocaina consumo_medicas consumo_menos_frecuentes
 probit estudia `indep' if edad_estudiar==1
 estimates store m4 
 
@@ -382,11 +387,8 @@ estimates store m8
 esttab m*,nobaselevels label
  
 /* menú de variables dependientes pa elegir
-
-indep_m1 mujer edad matrimonio ingreso prospera_mon prospera_bec fuma regalo facilidad prevencion prevencion_escuela consumo_medicas consumo_marihuana consumo_cocaina consumo_pesadas alcoholismo mujer edad matrimonio ingreso prospera_mon prospera_bec fuma regalo facilidad prevencion prevencion_escuela consumo_medicas consumo_marihuana consumo_cocaina consumo_pesadas alcoholismo 
-
+indep_m1 mujer edad matrimonio ingreso prospera_mon prospera_bec fuma regalo facilidad prevencion prevencion_escuela consumo_medicas consumo_marihuana consumo_cocaina consumo_menos_frecuentes alcoholismo mujer edad matrimonio ingreso prospera_mon prospera_bec fuma regalo facilidad prevencion prevencion_escuela consumo_medicas consumo_marihuana consumo_cocaina consumo_menos_frecuentes alcoholismo 
 indice_marginacion grado_marginacion
-
 total_Feminicidio2015
 total_Homicidio_culposo2015 
 total_Homicidio_doloso2015
@@ -401,41 +403,62 @@ tasa_homicidioscul_1517
 tasa_homicidiosdol_1517
 */ 
 
+
 * ==================================================================
-* PROBANDO PROBIT
+*GRAFICAS
 * ==================================================================
 
- close log
- clear
- 
- *Graficas 
- graph pie, over(droga_12meses) plabel(_all percent, format("%2.1f")) title("Drogas consumidas en los últimos 12 meses ") note("La categoría “menos frecuentes” es la compilación de aquellas drogas ilegales que por sí solas no son muy frecuentes.")
+/*
+
+graph pie, over(droga_12meses) plabel(_all percent, format("%2.1f")) graphregion(color(white)) ///
+title("Drogas consumidas en los últimos 12 meses ") name(12m) ///
+note("La categoría “menos frecuentes” es la compilación de aquellas drogas ilegales que por sí solas no son muy frecuentes.")
 
 graph export 12m.pdf
 
-graph pie, over(droga_30dias) plabel(_all percent, format("%2.1f")) title("Drogas consumidas en los últimos 30 días") note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes.")
+graph pie, over(droga_30dias) plabel(_all percent, format("%2.1f")) graphregion(color(white)) ///
+title("Drogas consumidas en los últimos 30 días") name(30d) ///
+note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes.")
 
 graph export 30d.pdf
 
-graph pie, over(droga_30dias) plabel(_all percent, format("%2.1f")) by(mujer, title("Drogas consumidas en los últimos 30 días") note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes."))
+graph pie, over(droga_30dias) plabel(_all percent, format("%2.1f")) graphregion(color(white)) ///
+by(mujer, title("Drogas consumidas en los últimos 30 días") name(30d_sexo) ///
+note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes."))
 
-graph pie, over(droga_12meses) plabel(_all percent, format("%2.1f")) by(mujer, title("Drogas consumidas en los últimos 12 meses") note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes."))
+graph pie, over(droga_12meses) plabel(_all percent, format("%2.1f")) graphregion(color(white)) ///
+by(mujer, title("Drogas consumidas en los últimos 12 meses") name(12m_sexo) ///
+note("La categoría “menos frecuentes” es la compilación de aquel las drogas ilegales que por sí solas no son muy frecuentes."))
 
-graph bar, ///
-over(droga_12meses) ///
-title("Drogas consumidas en los últimos 12 meses")
-graph export 12mbars.pdf
+*/
 
-graph bar, ///
-over(droga_12meses) ///
-title("Drogas consumidas en los últimos 12 meses")
-graph export 30dbars.pdf
+capture graph drop _30d
+graph bar (mean) consumo_medicas_30 consumo_marihuana_30 consumo_cocaina_30 consumo_menos_frecuentes_30  if droga_30dias!=0, /// 
+ graphregion(color(white)) note("El total excede 1 ya que algunas personas usaron más de un tipo de droga." "Menos frecuentes: crack, alucinógenos, inhalables, heroína, estimulantes y otros.") /// 
+ blab(bar, format("%3.2f")) leg(lab(1 "Médicas")lab(2 "Marihuana")lab(3 "Cocaína")lab(4 "Menos frecuentes")) ///
+title("Tipo de droga consumida por las personas que consumieron" "en los últimos 30 días") name(_30d) ytitle("Proporción") bar(1, bcolor(red)) bar(2, bcolor(blue)) bar(3, bcolor(green)) bar(4, bcolor(orange))
 
-graph bar, ///
-over(droga_30dias) ///
-by(mujer, title("Drogas consumidas en los últimos 30 dias"))
 
-graph bar, ///
-over(droga_12meses) ///
-by(mujer, title("Drogas consumidas en los últimos 12 meses"))
+capture graph drop _12m
+graph bar consumo_medicas consumo_marihuana consumo_cocaina consumo_menos_frecuentes  if droga_12meses!=0, ///
+ graphregion(color(white)) note("El total excede 1 ya que algunas personas usaron más de un tipo de droga." "Menos frecuentes: crack, alucinógenos, inhalables, heroína, estimulantes y otros.") /// 
+ percent blab(bar, format("%3.2f")) leg(lab(1 "Médicas")lab(2 "Marihuana")lab(3 "Cocaína")lab(4 "Menos frecuentes"))  ///
+title("Tipo de droga consumida por las personas que consumieron" "en los últimos 12 meses") name(_12m) ytitle("Proporción") bar(1, bcolor(red)) bar(2, bcolor(blue)) bar(3, bcolor(green)) bar(4, bcolor(orange))
 
+capture graph drop _30dsexo
+graph bar consumo_medicas_30 consumo_marihuana_30 consumo_cocaina_30 consumo_menos_frecuentes_30  if droga_30dias!=0, ///
+ graphregion(color(white)) note("El total excede 1 ya que algunas personas usaron más de un tipo de droga." "Menos frecuentes: crack, alucinógenos, inhalables, heroína, estimulantes y otros.") /// 
+blab(bar, format("%3.2f")) leg(lab(1 "Médicas")lab(2 "Marihuana")lab(3 "Cocaína")lab(4 "Menos frecuentes"))  ///
+by(mujer,title("Tipo de droga consumida por las personas que consumieron" "en los últimos 30 días")) name(_30dsexo) ytitle("Proporción") bar(1, bcolor(red)) bar(2, bcolor(blue)) bar(3, bcolor(green)) bar(4, bcolor(orange))
+
+capture graph drop _12msexo
+graph bar consumo_medicas consumo_marihuana consumo_cocaina consumo_menos_frecuentes   if droga_12meses!=0, ///
+ graphregion(color(white)) note("El total excede 1 ya que algunas personas usaron más de un tipo de droga." "Menos frecuentes: crack, alucinógenos, inhalables, heroína, estimulantes y otros.") /// 
+ blab(bar, format("%3.2f")) leg(lab(1 "Médicas")lab(2 "Marihuana")lab(3 "Cocaína")lab(4 "Menos frecuentes"))  //
+by(mujer,title("Tipo de droga consumida por las personas que consumieron" "en los últimos 12 meses")) name(_12msexo) ytitle("Proporción") bar(1, bcolor(red)) bar(2, bcolor(blue)) bar(3, bcolor(green)) bar(4, bcolor(orange))
+
+
+
+close log
+clear
+ 
