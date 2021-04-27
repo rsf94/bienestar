@@ -300,7 +300,7 @@ gen droga_30dias = 1 if consumo_medicas_30 == 1
 replace droga_30dias = 2 if consumo_marihuana_30 == 1
 replace droga_30dias = 3 if consumo_cocaina_30 == 1
 replace droga_30dias = 4 if consumo_menos_frecuentes_30 == 1
-replace droga_12meses = 0 if consumo_medicas_30 == 0 &consumo_marihuana_30 == 0 & consumo_cocaina_30 == 0 & consumo_menos_frecuentes_30 ==0
+replace droga_30dias = 0 if consumo_medicas_30 == 0 &consumo_marihuana_30 == 0 & consumo_cocaina_30 == 0 & consumo_menos_frecuentes_30 ==0
 
 label define name_drogas 1 "médicas" 2 "marihuana" 3 "cocaína" 4 "menos frecuentes" 
 label values droga_12meses name_drogas
