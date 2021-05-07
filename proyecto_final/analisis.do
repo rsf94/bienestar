@@ -428,6 +428,66 @@ tasa_homicidioscul_1517
 tasa_homicidiosdol_1517
 */ 
 
+* ==================================================================
+* PROBANDO MATCHING
+* ==================================================================
+
+*Probamos calipers de .001 .0005 y .0001, con radios mayores siempre hay vecinos
+*Probamos con 1, 2 y 3 vecinos
+
+*Marihuana
+ psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(1) ai(1) warn 
+  psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(1) ai(1) warn 
+   psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(1) ai(1) warn 
+
+    psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(2) ai(2) warn 
+  psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(2) ai(2) warn 
+   psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(2) ai(2) warn 
+   
+    psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(3) ai(3) warn 
+  psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(3) ai(3) warn 
+   psmatch2 consumo_marihuana mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(3) ai(3) warn 
+   
+  *Cocaina
+ psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(1) ai(1) warn 
+  psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(1) ai(1) warn 
+   psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(1) ai(1) warn 
+
+    psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(2) ai(2) warn 
+  psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(2) ai(2) warn 
+   psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(2) ai(2) warn 
+   
+    psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(3) ai(3) warn logit
+  psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(3) ai(3) warn logit
+   psmatch2 consumo_cocaina mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(3) ai(3) warn logit
+   
+   *Medicas
+ psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(1) ai(1) warn logit
+  psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(1) ai(1) warn logit
+   psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(1) ai(1) warn logit
+
+    psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(2) ai(2) warn logit
+  psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(2) ai(2) warn logit
+   psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(2) ai(2) warn logit
+   
+    psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(3) ai(3) warn logit
+  psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(3) ai(3) warn logit
+   psmatch2 consumo_medicas mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(3) ai(3) warn logit
+   
+  
+   *Otras
+ psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(1) ai(1) warn logit
+  psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(1) ai(1) warn logit
+   psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(1) ai(1) warn logit
+
+    psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(2) ai(2) warn logit
+  psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(2) ai(2) warn logit
+   psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(2) ai(2) warn logit
+   
+    psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0010) outcome(estudia) neighbor(3) ai(3) warn logit
+  psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0005) outcome(estudia) neighbor(3) ai(3) warn logit
+   psmatch2 consumo_menos_frecuentes mujer indice_marginacion tasa_homicidiosdol_1517, caliper(.0001) outcome(estudia) neighbor(3) ai(3) warn logit
+   
 
 * ==================================================================
 *GRAFICAS
