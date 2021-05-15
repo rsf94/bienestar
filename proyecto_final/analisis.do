@@ -315,6 +315,16 @@ label define name_drogas 1 "Médicas" 2 "Marihuana" 3 "Cocaína" 4 "Menos frecue
 label values droga_12meses name_drogas
 label values droga_30dias name_drogas
 
+
+
+* consumo por estado
+estpost tabstat consumo_medicas consumo_marihuana consumo_cocaina consumo_menos_frecuentes, by(desc_ent)
+esttab . using "$tables\consumo_entidad.tex", cells("consumo_medicas(fmt(%5.3f)) consumo_marihuana consumo_cocaina consumo_menos_frecuentes")  replace label
+
+estpost tabstat consumo_medicas consumo_marihuana consumo_cocaina consumo_menos_frecuentes, by(ingreso)
+esttab . using "$tables\consumo_ingreso.tex", cells("consumo_medicas(fmt(%5.3f)) consumo_marihuana consumo_cocaina consumo_menos_frecuentes")  replace label
+
+
 estpost tabstat estudia  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso, statistics(mean) by(droga_12meses)
 esttab . using "$tables\descriptive_12meses.tex", cells("estudia(fmt(%9.1f))  mujer indigena religion  alguna_religion prospera_bec edad num_personas ingreso")  replace 
 
@@ -410,6 +420,20 @@ probit estudia `indep' if edad_estudiar==1
 estimates store m8 
  
 esttab m*,nobaselevels label
+
+* ==================================================================
+* PROBIT BUENO
+* ==================================================================
+
+local indep consumo_marihuana consumo_cocaina consumo_medicas consumo_menos_frecuentes mujer indice_marginacion ingreso prevencion_escuela tasa_homicidiosdol_1517
+probit estudia `indep' if edad_estudiar==1
+margins,post dydx(*) atmeans
+estimates store m0
+
+* EPP
+esttab m0 using "$tables\epp_probit.tex",se nobaselevels replace label star(* 0.10 ** 0.05 *** 0.01)
+ 
+ 
  
 /* menú de variables dependientes pa elegir
 indep_m1 mujer edad matrimonio ingreso prospera_mon prospera_bec fuma regalo facilidad prevencion prevencion_escuela consumo_medicas consumo_marihuana consumo_cocaina consumo_menos_frecuentes alcoholismo mujer edad matrimonio ingreso prospera_mon prospera_bec fuma regalo facilidad prevencion prevencion_escuela consumo_medicas consumo_marihuana consumo_cocaina consumo_menos_frecuentes alcoholismo 
